@@ -121,6 +121,28 @@ function finishAnalysis(){$('status').classList.add('hidden');$('analysisFeature
 window.showResult=()=>{$('resultTitle').textContent=configs[item].label+'・'+plane;$('quality').textContent='撮影品質：'+(qualityScore>=80?'良好':qualityScore>=60?'参考':'再撮影推奨');$('postureScoreBox').innerHTML=scoreHtml(postureScore);$('postureScoreBox').classList.toggle('hidden',!postureScore);$('resultFeatures').innerHTML=features.map(x=>`<div class="feature">${x}</div>`).join('');const txt=item==='gait'?'歩行は周期性、左右対称性、一貫性、多関節協調として確認します。':item==='throw'?'投球は肩・肘・体幹の位置変化を確認します。関節モーメントや組織損傷は判定しません。':item==='golf'?'ゴルフはアドレスからフィニッシュまでの身体位置を確認します。唯一の理想フォームを判定しません。':'ランドマーク位置と角度変化を参考情報として表示します。';$('interpretation').textContent=txt;go(6);setTimeout(createResultQr,0)};
 
 let detectedFootType='';
+function resetFootScreen(){
+  detectedFootType='';
+  const proposal=$('footProposal'),resultBtn=$('footResultBtn'),manual=$('toeManual'),status=$('footStatus'),error=$('footError'),photoWrap=$('footPhotoWrap');
+  if(proposal)proposal.classList.add('hidden');
+  if(resultBtn)resultBtn.classList.add('hidden');
+  if(manual)manual.classList.add('hidden');
+  if(status)status.classList.add('hidden');
+  if(error)error.classList.add('hidden');
+  if(photoWrap)photoWrap.classList.add('hidden');
+  document.querySelectorAll('[data-foot-type]').forEach(b=>b.classList.remove('active'));
+}
+
+function validateFoot(){
+  const l=+$('footLength').value,g=+$('footGirth').value,w=+$('footWidth').value,c=$('footCategory').value,e=[];
+  const range=c==='child'?[105,245]:c==='female'?[220,260]:[245,290];
+  if(!(l>=range[0]&&l<=range[1]))e.push(`足長を${range[0]}〜${range[1]}mmで入力してください。`);
+  if(!(g>=90&&g<=330))e.push('足囲を90〜330mmで入力してください。');
+  if(!(w>=35&&w<=130))e.push('足幅を35〜130mmで入力してください。');
+  $('footError').innerHTML=e.join('<br>');
+  $('footError').classList.toggle('hidden',!e.length);
+  return !e.length;
+}
 const CHILD_WISE=['B','C','D','1E','2E','3E','4E','F','G'];
 const SYUNSOKU_CHILD_JIS={
 105:{girth:[98, 104, 110, 116, 122, 128, 134, 140, 146],width:[40, 42, 44, 46, 48, 50, 53, 55, 57]},
