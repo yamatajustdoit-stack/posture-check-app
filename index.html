@@ -1,9 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f5fa8">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#0f5fa8" name="theme-color"/>
 <title>index｜身体・足・姿勢・動作・音声チェック</title>
 <style>
 :root{--blue:#0f5fa8;--ink:#172033;--muted:#647085;--bg:#f3f7fa;--line:#d9e3ec;--ok:#157a55;--warn:#8a5700}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic","Hiragino Sans",sans-serif}main{max-width:720px;margin:auto;padding:16px 14px 44px}.screen{display:none}.screen.active{display:block}.card{background:#fff;border-radius:20px;padding:20px;margin:12px 0;box-shadow:0 8px 28px rgba(20,50,80,.08)}h1{font-size:25px;margin:6px 0 16px}h2{font-size:20px}.lead{font-size:17px;font-weight:700;line-height:1.65}.muted,.small{color:var(--muted);line-height:1.65}.small{font-size:13px}.btn,.menuBtn,.planeBtn{width:100%;border:0;border-radius:15px;padding:14px 16px;font-size:16px;font-weight:800}.btn{background:var(--blue);color:#fff;margin-top:12px}.btn.secondary{background:#fff;color:var(--blue);border:2px solid #bdd6eb}.btn.danger{background:#982e2e}.btn:disabled{opacity:.45}.back{border:0;background:none;color:var(--blue);font-size:16px;padding:7px 0 12px}.menuGrid,.planeGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.menuBtn{min-height:86px;background:#fff;border:2px solid #dde5ec;text-align:left}.menuBtn span{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:500}.planeBtn{background:#fff;border:2px solid #bdd6eb;color:var(--blue);min-height:62px}.box,.status,.resultBox{padding:14px;border-radius:14px;margin:12px 0;line-height:1.65}.box{background:#eef6fc}.status{background:#fff7e6;color:#704700}.resultBox{background:#f4f8fb;border-left:5px solid var(--blue)}.check{display:flex;align-items:flex-start;gap:9px;background:#eef6fc;padding:14px;border-radius:14px}.check input{width:22px;height:22px}.hidden{display:none!important}input[type=file]{display:none}.videoStage,.imageStage{position:relative;width:100%;overflow:hidden;border-radius:16px;background:#111}.videoStage video,.imageStage canvas{display:block;width:100%;height:auto}.videoStage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.pill{display:inline-block;border-radius:999px;background:#eaf8f1;color:var(--ok);padding:5px 10px;font-size:12px;font-weight:800}.feature{background:#f1f4f7;border-left:5px solid var(--blue);padding:11px 13px;border-radius:11px;margin:8px 0}.positiveSummary{background:linear-gradient(135deg,#eaf8f1,#eef6fc);border:2px solid #ccebdc;border-radius:16px;padding:15px;margin:12px 0}.positiveSummary h3{margin:0 0 8px;color:#126747}.feedbackSection{margin:16px 0}.feedbackSection h3{font-size:17px;margin:0 0 8px}.feature.goodFeature{background:#eefaf4;border-left-color:#1d9a67}.feature.focusFeature{background:#fff9e9;border-left-color:#d89a19}.nextAction{background:#eef6fc;border-left:5px solid var(--blue);border-radius:14px;padding:14px;margin:14px 0;line-height:1.7}.choiceRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.choiceRow button{border:2px solid #bdd6eb;background:#fff;color:var(--blue);border-radius:12px;padding:11px;font-weight:800}@media(max-width:520px){.choiceRow{grid-template-columns:1fr}}.spinner{width:32px;height:32px;border:4px solid #d5e6f4;border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:4px auto}@keyframes spin{to{transform:rotate(360deg)}}.footGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.footField label{display:block;font-weight:800;margin-bottom:5px}.footField input,.footField select{width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-size:17px;background:#fff}.footResults{margin-top:14px}.footBrand{border:1px solid var(--line);border-radius:13px;padding:12px;margin:8px 0}.footBrand b{color:var(--blue)}.toeChoice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.toeChoice button{padding:10px;border:2px solid var(--line);border-radius:11px;background:#fff;font-weight:800}.toeChoice button.active{border-color:var(--blue);background:#eef6fc;color:var(--blue)}.scoreCard{background:linear-gradient(135deg,#0f5fa8,#1687c7);color:#fff;border-radius:18px;padding:18px;margin:14px 0}.scoreValue{font-size:52px;font-weight:900}.scoreGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.scorePart{background:rgba(255,255,255,.16);border-radius:10px;padding:9px}.scoreHeadline{font-size:14px;font-weight:800;opacity:.95}.scoreMessage{font-size:18px;font-weight:900;margin:4px 0 12px}.scoreBarWrap{height:12px;background:rgba(255,255,255,.24);border-radius:999px;overflow:hidden;margin:10px 0 14px}.scoreBar{height:100%;background:linear-gradient(90deg,#9be7c4,#fff18a);border-radius:999px}.scoreSummary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.scoreSummaryItem{background:rgba(255,255,255,.16);border-radius:12px;padding:10px}.scoreSummaryItem strong{display:block;font-size:22px}.scorePart.good{border:1px solid rgba(183,255,218,.65)}.scorePart.watch{border:1px solid rgba(255,239,166,.75)}.nextStepBox{background:#eef6fc;border-left:5px solid var(--blue);padding:14px;border-radius:14px;margin-top:12px;line-height:1.65}.scoreNote{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:10px}.qrBox{text-align:center;border:2px solid var(--line);border-radius:16px;padding:16px;margin-top:18px}.qrCanvas{display:flex;justify-content:center;margin:12px auto}.qrCanvas img,.qrCanvas canvas{max-width:220px;width:100%;height:auto}.shareResult{max-width:620px;margin:auto}@media(max-width:500px){.menuGrid,.planeGrid,.footGrid,.toeChoice{grid-template-columns:1fr}}
@@ -12,48 +13,47 @@
 </style>
 </head>
 <body><main>
-<section id="s0" class="screen active"><div class="hero"><h1>index</h1><p class="lead">身体・足・姿勢・動作・音声を、分かりやすく確認します。</p><p class="muted">結果は今回確認できた特徴を表示する参考情報であり、診断や発達判定ではありません。</p><button class="btn" onclick="go(1)">チェックを始める</button></div></section>
-<section id="s1" class="screen"><button class="back" onclick="go(0)">← 戻る</button><h1>ご利用前の確認</h1><div class="card"><p>結果は撮影角度、服装、照明、動画品質の影響を受けます。画像・動画はブラウザー内で処理します。</p><label class="check"><input id="consent" type="checkbox"><span>撮影とブラウザー上での解析に同意します</span></label><button id="consentBtn" class="btn" disabled onclick="go(2)">5つのカテゴリーを選ぶ</button></div></section>
-<section id="s2" class="screen"><button class="back" onclick="go(1)">← 戻る</button><h1>カテゴリーを選んでください</h1><p class="muted">5つのカテゴリーから、確認したい項目を選んでください。</p><div id="menu"></div></section>
-<section id="s3" class="screen"><button class="back" onclick="go(2)">← 項目選択へ</button><h1 id="planeTitle">撮影面を選択</h1><div id="planes" class="planeGrid"></div></section>
-<section id="s4" class="screen"><button class="back" onclick="go(3)">← 撮影面選択へ</button><h1 id="captureTitle"></h1><div class="card"><div id="guide" class="box"></div><input id="captureInput" type="file" capture="environment"><button id="captureBtn" class="btn">撮影する</button></div></section>
-<section id="s5" class="screen"><button class="back" onclick="go(4)">← 撮影へ</button><h1>自動解析</h1><div class="card"><div id="imageWrap" class="imageStage hidden"><canvas id="imageCanvas"></canvas></div><div id="videoWrap" class="videoStage hidden"><video id="motionVideo" playsinline muted controls></video><canvas id="videoCanvas"></canvas></div><div id="status" class="status">撮影データを読み込んでください。</div><button id="startBtn" class="btn hidden">先頭から解析する</button><div id="analysisBox" class="hidden"><h2>今回の良いところと特徴</h2><div id="analysisFeatures"></div></div><button id="resultBtn" class="btn hidden" onclick="showResult()">結果を見る</button><button class="btn secondary" onclick="captureInput.click()">撮り直す</button></div></section>
-<section id="s6" class="screen"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span id="quality" class="pill"></span><div id="postureScoreBox" class="hidden"></div><div id="resultFeatures"></div><div id="interpretation" class="resultBox"></div><p class="small">できているところと今回の特徴を確認するための参考情報です。撮影条件によって結果は変わります。</p><div id="resultQrBox" class="qrBox hidden"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div id="resultQr" class="qrCanvas"></div></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
-
-<section id="s7" class="screen">
-  <button class="back" onclick="go(2)">← 項目選択へ</button>
-  <h1>足の測定・靴の提案</h1>
-  <div class="card">
-    <h2>1. 足の計測値を入力</h2>
-    <p class="small">子ども・成人女性・成人男性に対応しています。左右を測り、大きい側の値をmmで入力してください。</p>
-    <div class="footField" style="margin-bottom:12px"><label for="footCategory">照合区分</label><select id="footCategory" style="width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-size:17px"><option value="child">子ども用（原則11歳以下）</option><option value="female">成人女性用（原則12歳以上）</option><option value="male">成人男性用（原則12歳以上）</option></select></div>
-    <div id="childAgeField" class="footField" style="margin-bottom:12px"><label for="childAgeGroup">子どもの年齢区分</label><select id="childAgeGroup" style="width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-size:17px"><option value="0-1">0〜1歳</option><option value="1-3" selected>1〜3歳</option><option value="4-6">4〜6歳</option><option value="7-11">7〜11歳</option></select><span class="small">年齢は捨て寸と再測定時期の案内にのみ使用します。ウイズは実測値から判定します。</span></div>
-    <div class="footGrid">
-      <div class="footField"><label for="footLength">足長</label><input id="footLength" type="number" min="105" max="300" step="1" placeholder="例 120 / 260"></div>
-      <div class="footField"><label for="footGirth">足囲</label><input id="footGirth" type="number" min="90" max="330" step="1" placeholder="例 134 / 255"></div>
-      <div class="footField"><label for="footWidth">足幅</label><input id="footWidth" type="number" min="35" max="130" step="1" placeholder="例 53 / 104"></div>
-    </div>
-    <div id="footError" class="status hidden"></div>
-    <h2>2. 足を真上から撮影</h2>
-    <div class="box">白いA4用紙の上へ片足を置き、つま先を画面上、かかとを画面下にして撮影してください。足全体と用紙四隅を入れ、影を減らしてください。</div>
-    <input id="footPhotoInput" type="file" accept="image/*" capture="environment">
-    <button class="btn" onclick="footPhotoInput.click()">足を撮影する</button>
-    <div id="footPhotoWrap" class="imageStage hidden"><canvas id="footCanvas"></canvas></div>
-    <div id="footStatus" class="status hidden"></div>
-    <div id="toeManual" class="hidden">
-      <p><b>自動判定が異なる場合は修正してください</b></p>
-      <div class="toeChoice">
-        <button data-foot-type="エジプト型">エジプト型</button>
-        <button data-foot-type="ギリシャ型">ギリシャ型</button>
-        <button data-foot-type="スクエア型">スクエア型</button>
-      </div>
-    </div>
-    <button id="footResultBtn" class="btn hidden" onclick="showFootProposal()">靴の提案を見る</button>
-    <div id="footProposal" class="footResults hidden"></div>
-  </div>
+<section class="screen active" id="s0"><div class="hero"><h1>index</h1><p class="lead">身体・足・姿勢・動作・音声を、分かりやすく確認します。</p><p class="muted">結果は今回確認できた特徴を表示する参考情報であり、診断や発達判定ではありません。</p><button class="btn" onclick="go(1)">チェックを始める</button></div></section>
+<section class="screen" id="s1"><button class="back" onclick="go(0)">← 戻る</button><h1>ご利用前の確認</h1><div class="card"><p>結果は撮影角度、服装、照明、動画品質の影響を受けます。画像・動画はブラウザー内で処理します。</p><label class="check"><input id="consent" type="checkbox"/><span>撮影とブラウザー上での解析に同意します</span></label><button class="btn" disabled="" id="consentBtn" onclick="go(2)">5つのカテゴリーを選ぶ</button></div></section>
+<section class="screen" id="s2"><button class="back" onclick="go(1)">← 戻る</button><h1>カテゴリーを選んでください</h1><p class="muted">5つのカテゴリーから、確認したい項目を選んでください。</p><div id="menu"></div></section>
+<section class="screen" id="s3"><button class="back" onclick="go(2)">← 項目選択へ</button><h1 id="planeTitle">撮影面を選択</h1><div class="planeGrid" id="planes"></div></section>
+<section class="screen" id="s4"><button class="back" onclick="go(3)">← 撮影面選択へ</button><h1 id="captureTitle"></h1><div class="card"><div class="box" id="guide"></div><input capture="environment" id="captureInput" type="file"/><button class="btn" id="captureBtn">撮影する</button></div></section>
+<section class="screen" id="s5"><button class="back" onclick="go(4)">← 撮影へ</button><h1>自動解析</h1><div class="card"><div class="imageStage hidden" id="imageWrap"><canvas id="imageCanvas"></canvas></div><div class="videoStage hidden" id="videoWrap"><video controls="" id="motionVideo" muted="" playsinline=""></video><canvas id="videoCanvas"></canvas></div><div class="status" id="status">撮影データを読み込んでください。</div><button class="btn hidden" id="startBtn">先頭から解析する</button><div class="hidden" id="analysisBox"><h2>今回の良いところと特徴</h2><div id="analysisFeatures"></div></div><button class="btn hidden" id="resultBtn" onclick="showResult()">結果を見る</button><button class="btn secondary" onclick="captureInput.click()">撮り直す</button></div></section>
+<section class="screen" id="s6"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span class="pill" id="quality"></span><div class="hidden" id="postureScoreBox"></div><div id="resultFeatures"></div><div class="resultBox" id="interpretation"></div><p class="small">できているところと今回の特徴を確認するための参考情報です。撮影条件によって結果は変わります。</p><div class="qrBox hidden" id="resultQrBox"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div class="qrCanvas" id="resultQr"></div></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
+<section class="screen" id="s7">
+<button class="back" onclick="go(2)">← 項目選択へ</button>
+<h1>足の測定・靴の提案</h1>
+<div class="card">
+<h2>1. 足の計測値を入力</h2>
+<p class="small">子ども・成人女性・成人男性に対応しています。左右を測り、大きい側の値をmmで入力してください。</p>
+<div class="footField" style="margin-bottom:12px"><label for="footCategory">照合区分</label><select id="footCategory" style="width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-size:17px"><option value="child">子ども用（原則11歳以下）</option><option value="female">成人女性用（原則12歳以上）</option><option value="male">成人男性用（原則12歳以上）</option></select></div>
+<div class="footField" id="childAgeField" style="margin-bottom:12px"><label for="childAgeGroup">子どもの年齢区分</label><select id="childAgeGroup" style="width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-size:17px"><option value="0-1">0〜1歳</option><option selected="" value="1-3">1〜3歳</option><option value="4-6">4〜6歳</option><option value="7-11">7〜11歳</option></select><span class="small">年齢は捨て寸と再測定時期の案内にのみ使用します。ウイズは実測値から判定します。</span></div>
+<div class="footGrid">
+<div class="footField"><label for="footLength">足長</label><input id="footLength" max="300" min="105" placeholder="例 120 / 260" step="1" type="number"/></div>
+<div class="footField"><label for="footGirth">足囲</label><input id="footGirth" max="330" min="90" placeholder="例 134 / 255" step="1" type="number"/></div>
+<div class="footField"><label for="footWidth">足幅</label><input id="footWidth" max="130" min="35" placeholder="例 53 / 104" step="1" type="number"/></div>
+</div>
+<div class="status hidden" id="footError"></div>
+<h2>2. 足を真上から撮影</h2>
+<div class="box">白いA4用紙の上へ片足を置き、つま先を画面上、かかとを画面下にして撮影してください。足全体と用紙四隅を入れ、影を減らしてください。</div>
+<input accept="image/*" capture="environment" id="footPhotoInput" type="file"/>
+<button class="btn" onclick="footPhotoInput.click()">足を撮影する</button>
+<div class="imageStage hidden" id="footPhotoWrap"><canvas id="footCanvas"></canvas></div>
+<div class="status hidden" id="footStatus"></div>
+<div class="hidden" id="toeManual">
+<p><b>自動判定が異なる場合は修正してください</b></p>
+<div class="toeChoice">
+<button data-foot-type="エジプト型">エジプト型</button>
+<button data-foot-type="ギリシャ型">ギリシャ型</button>
+<button data-foot-type="スクエア型">スクエア型</button>
+</div>
+</div>
+<button class="btn hidden" id="footResultBtn" onclick="showFootProposal()">靴の提案を見る</button>
+<div class="footResults hidden" id="footProposal"></div>
+</div>
 </section>
-<section id="s8" class="screen"><div class="shareResult"><h1>姿勢・動作 簡易チェック</h1><div class="card"><h2 id="sharedTitle">測定結果</h2><div id="sharedScore"></div><div id="sharedFeatures"></div><div id="sharedNote" class="resultBox"></div><p class="small">結果は撮影時の参考情報であり、診断ではありません。画像・動画は結果URLに含まれていません。</p></div></div></section>
-<section id="s9" class="screen"><button class="back" onclick="go(0)">← ホームへ</button><h1>音声チェック</h1><div class="card"><div class="voiceTabs"><button id="childVoiceTab" class="voiceTab active" onclick="setVoiceMode('child')">子ども</button><button id="seniorVoiceTab" class="voiceTab" onclick="setVoiceMode('senior')">シニア</button></div><p id="voiceGuide" class="muted">表示されたことばを声に出してください。</p><div id="voicePrompt" class="voicePrompt">パンダ</div><div id="childChoices" class="toeChoice"><button onclick="setChildWord('パンダ')">パンダ</button><button onclick="setChildWord('たいこ')">たいこ</button><button onclick="setChildWord('かさ')">かさ</button><button onclick="setChildWord('りんご')">りんご</button><button onclick="setChildWord('ラッパ')">ラッパ</button></div><button id="voiceRecordBtn" class="btn" onclick="toggleVoiceRecording()">録音を開始</button><div id="voiceRecordingStatus" class="status recording hidden">録音中です。終わったら「録音を終了」を押してください。</div><div id="voiceResult" class="resultBox voiceResult hidden"><h2>今回の録音結果</h2><audio id="voicePlayback" controls style="width:100%"></audio><p id="voiceDuration"></p><div id="seniorVoiceAnalysis" class="hidden"><div class="voiceAnalysisGrid"><div class="voiceMetric"><b>言い間違え</b><strong id="mistakeScore">解析中</strong><p id="mistakeNote" class="small"></p></div><div class="voiceMetric"><b>スムーズさ</b><strong id="smoothScore">解析中</strong><p id="smoothNote" class="small"></p></div><div class="voiceMetric"><b>活舌</b><strong id="clarityScore">解析中</strong><p id="clarityNote" class="small"></p></div></div><button id="voiceRetryBtn" class="btn secondary hidden" onclick="retrySeniorRecognition()">解析用にもう一度音読する</button><div id="voiceAnalysisStatus" class="status hidden"></div><div class="voiceTranscript"><b>音声認識結果</b><div id="voiceTranscriptText" class="small">解析中です</div></div></div><p class="small">3項目は音声認識と録音状態から算出した参考情報です。音声認識の誤りを本人の言い間違いとして表示する場合があります。構音障害、失語症、認知機能、病気の有無を診断するものではありません。</p></div></div></section>
+<section class="screen" id="s8"><div class="shareResult"><h1>姿勢・動作 簡易チェック</h1><div class="card"><h2 id="sharedTitle">測定結果</h2><div id="sharedScore"></div><div id="sharedFeatures"></div><div class="resultBox" id="sharedNote"></div><p class="small">結果は撮影時の参考情報であり、診断ではありません。画像・動画は結果URLに含まれていません。</p></div></div></section>
+<section class="screen" id="s9"><button class="back" onclick="go(0)">← ホームへ</button><h1>音声チェック</h1><div class="card"><div class="voiceTabs"><button class="voiceTab active" id="childVoiceTab" onclick="setVoiceMode('child')">子ども</button><button class="voiceTab" id="seniorVoiceTab" onclick="setVoiceMode('senior')">シニア</button></div><p class="muted" id="voiceGuide">表示されたことばを声に出してください。</p><div class="voicePrompt" id="voicePrompt">パンダ</div><div class="toeChoice" id="childChoices"><button onclick="setChildWord('パンダ')">パンダ</button><button onclick="setChildWord('たいこ')">たいこ</button><button onclick="setChildWord('かさ')">かさ</button><button onclick="setChildWord('りんご')">りんご</button><button onclick="setChildWord('ラッパ')">ラッパ</button></div><button class="btn" id="voiceRecordBtn" onclick="toggleVoiceRecording()">録音を開始</button><div class="status recording hidden" id="voiceRecordingStatus">録音中です。終わったら「録音を終了」を押してください。</div><div class="resultBox voiceResult hidden" id="voiceResult"><h2>今回の録音結果</h2><audio controls="" id="voicePlayback" style="width:100%"></audio><p id="voiceDuration"></p><div class="hidden" id="seniorVoiceAnalysis"><div class="voiceAnalysisGrid"><div class="voiceMetric"><b>言い間違え</b><strong id="mistakeScore">解析中</strong><p class="small" id="mistakeNote"></p></div><div class="voiceMetric"><b>スムーズさ</b><strong id="smoothScore">解析中</strong><p class="small" id="smoothNote"></p></div><div class="voiceMetric"><b>活舌</b><strong id="clarityScore">解析中</strong><p class="small" id="clarityNote"></p></div></div><button class="btn secondary hidden" id="voiceRetryBtn" onclick="retrySeniorRecognition()">解析用にもう一度音読する</button><div class="status hidden" id="voiceAnalysisStatus"></div><div class="voiceTranscript"><b>音声認識結果</b><div class="small" id="voiceTranscriptText">解析中です</div></div></div><p class="small">3項目は音声認識と録音状態から算出した参考情報です。音声認識の誤りを本人の言い間違いとして表示する場合があります。構音障害、失語症、認知機能、病気の有無を診断するものではありません。</p></div></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
@@ -118,11 +118,11 @@ const configs={
  throw:{label:"投球フォーム",planes:["前額面"],kind:"video",desc:"肩・肘・体幹の特徴"},
  golf:{label:"ゴルフスイング",planes:["前額面","飛球線後方"],kind:"video",desc:"頭部・体幹・回旋"}
 };
-let item="",plane="",features=[],qualityScore=0,postureScore=null,landmarker=null,mode="",objectURL="",globalSamples=[],controller=null;
+let item="",plane="",features=[],qualityScore=0,postureScore=null,postureClassification=null,landmarker=null,mode="",objectURL="",globalSamples=[],controller=null;
 window.go=n=>{document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('s'+n).classList.add('active');scrollTo(0,0)};
 $('consent').addEventListener('change',()=>{$('consentBtn').disabled=!$('consent').checked});
 const categoryGroups=[['【計測】足の測定・靴の提案','cat-measure',['foot']],['【姿勢】座位・立位','cat-posture',['seated','standing']],['【動作】立ち上がり・歩行・階段昇降','cat-motion',['standup','gait','stairs']],['【スポーツ】スクワット・投球動作・ゴルフ','cat-sports',['squat','throw','golf']]];categoryGroups.forEach(([title,cls,keys])=>{const section=document.createElement('div');section.className='categorySection';section.innerHTML=`<div class="categoryHead ${cls}">${title}</div><div class="categoryGrid"></div>`;const grid=section.querySelector('.categoryGrid');keys.forEach(key=>{const c=configs[key];const b=document.createElement('button');b.className='menuBtn';b.innerHTML=`${c.label}<span>${c.desc}</span>`;b.addEventListener('click',()=>{if(key==='foot'){resetFootScreen();go(7)}else selectItem(key)});grid.appendChild(b)});$('menu').appendChild(section)});const voiceSection=document.createElement('div');voiceSection.className='categorySection';voiceSection.innerHTML='<div class="categoryHead cat-voice">【音声チェック】子ども・シニア</div><div class="categoryGrid"><button class="menuBtn" data-voice-mode="child">子ども<span>ことばを選んで録音</span></button><button class="menuBtn" data-voice-mode="senior">シニア<span>短い文章を音読して録音</span></button></div>';voiceSection.querySelectorAll('[data-voice-mode]').forEach(b=>b.addEventListener('click',()=>{go(9);window.setVoiceMode(b.dataset.voiceMode)}));$('menu').appendChild(voiceSection);
-function selectItem(key){item=key;const c=configs[key];$('planeTitle').textContent=c.label+'：撮影面を選択';$('planes').innerHTML='';c.planes.forEach(p=>{const b=document.createElement('button');b.className='planeBtn';b.textContent=p;b.onclick=()=>selectPlane(p);$('planes').appendChild(b)});go(3)}
+function selectItem(key){item=key;postureClassification=null;const c=configs[key];$('planeTitle').textContent=c.label+'：撮影面を選択';$('planes').innerHTML='';c.planes.forEach(p=>{const b=document.createElement('button');b.className='planeBtn';b.textContent=p;b.onclick=()=>selectPlane(p);$('planes').appendChild(b)});go(3)}
 function selectPlane(p){plane=p;const c=configs[item];$('captureTitle').textContent=c.label+'・'+p;$('captureInput').accept=c.kind==='video'?'video/*':'image/*';$('captureBtn').textContent=c.kind==='video'?'動画を撮影する':'写真を撮影する';$('captureBtn').onclick=()=>$('captureInput').click();$('guide').innerHTML=guideText(item,p);go(4)}
 function guideText(k,p){const common=`・全身または評価部位を画面内に入れる<br>・カメラを固定し、傾けない<br>・背景に別の人を入れない<br>・撮影面：${p}<br>`;const x={seated:'・足裏を床につけ自然に座る',standing:'・胸を張るよう指示せず自然に立つ',standup:'・椅子と全身を入れ自然に立ち上がる',gait:'・カメラへ向かって片道歩行する',stairs:'・段差全体と全身を入れる',squat:'・2〜3回ゆっくり行う',single:'・安全を確保して数秒保持する',throw:'・スローモーション推奨。投球全体を入れる',golf:'・スローモーション推奨。クラブを含め安全距離を取る'}[k];return common+x}
 async function getModel(nextMode){if(!landmarker){const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');landmarker=await PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',delegate:'GPU'},runningMode:nextMode,numPoses:1,minPoseDetectionConfidence:.55,minPosePresenceConfidence:.55,minTrackingConfidence:.5});mode=nextMode}else if(mode!==nextMode){await landmarker.setOptions({runningMode:nextMode});mode=nextMode}return landmarker}
@@ -131,7 +131,7 @@ function draw(ctx,c,lm){ctx.lineWidth=Math.max(3,c.width/190);ctx.strokeStyle='#
 function angle(a,b,c){const u={x:a.x-b.x,y:a.y-b.y},v={x:c.x-b.x,y:c.y-b.y};return Math.acos(Math.max(-1,Math.min(1,(u.x*v.x+u.y*v.y)/(Math.hypot(u.x,u.y)*Math.hypot(v.x,v.y)||1))))*180/Math.PI}
 function visibility(lm){const ids=[11,12,23,24,25,26,27,28];return Math.round(ids.reduce((s,i)=>s+(lm[i].visibility||0),0)/ids.length*100)}
 $('captureInput').addEventListener('change',()=>{const f=$('captureInput').files[0];if(!f)return;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(f);features=[];qualityScore=0;postureScore=null;$('analysisBox').classList.add('hidden');$('resultBtn').classList.add('hidden');if(configs[item].kind==='image'){const img=new Image();img.onload=()=>analyzeImage(img);img.src=objectURL}else{loadVideo(objectURL)}go(5)});
-async function analyzeImage(img){$('videoWrap').classList.add('hidden');$('imageWrap').classList.remove('hidden');$('startBtn').classList.add('hidden');$('status').innerHTML='<div class="spinner"></div>解析しています。';try{const m=await getModel('IMAGE'),r=m.detect(img);if(!r.landmarks?.length)throw Error('人物を検出できませんでした');const lm=r.landmarks[0],c=$('imageCanvas'),ctx=c.getContext('2d'),scale=Math.min(1,1200/img.width);c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);ctx.drawImage(img,0,0,c.width,c.height);draw(ctx,c,lm);qualityScore=visibility(lm);features=staticFeatures(lm);postureScore=(item==='seated'||item==='standing')?calculatePostureScore(lm,item,plane):null;finishAnalysis()}catch(e){$('status').textContent='解析できませんでした。'+e.message}}
+async function analyzeImage(img){$('videoWrap').classList.add('hidden');$('imageWrap').classList.remove('hidden');$('startBtn').classList.add('hidden');$('status').innerHTML='<div class="spinner"></div>解析しています。';try{const m=await getModel('IMAGE'),r=m.detect(img);if(!r.landmarks?.length)throw Error('人物を検出できませんでした');const lm=r.landmarks[0],c=$('imageCanvas'),ctx=c.getContext('2d'),scale=Math.min(1,1200/img.width);c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);ctx.drawImage(img,0,0,c.width,c.height);draw(ctx,c,lm);qualityScore=visibility(lm);features=staticFeatures(lm);postureScore=(item==='seated'||item==='standing')?calculatePostureScore(lm,item,plane):null;postureClassification=(item==='standing'&&plane==='矢状面')?classifyStandingPosture(lm):null;finishAnalysis()}catch(e){$('status').textContent='解析できませんでした。'+e.message}}
 function clampScore(v){return Math.max(0,Math.min(20,Math.round(v)))}
 function scoreGrade(v){return v>=90?'S':v>=80?'A':v>=70?'B':v>=60?'C':'D'}
 function calculatePostureScore(lm,type,view){let parts=[];if(view==='前額面'){const shoulder=Math.abs(lm[11].y-lm[12].y),hip=Math.abs(lm[23].y-lm[24].y),head=Math.abs(lm[0].x-(lm[11].x+lm[12].x)/2),trunk=Math.abs((lm[11].x+lm[12].x)/2-(lm[23].x+lm[24].x)/2),lower=Math.abs(lm[25].y-lm[26].y);parts=[['頭部中央',clampScore(20-head*220)],['肩の水平性',clampScore(20-shoulder*260)],['体幹中央',clampScore(20-trunk*220)],['骨盤の水平性',clampScore(20-hip*260)],[type==='seated'?'膝の水平性':'下肢の左右差',clampScore(20-lower*180)]]}else{const left=(lm[7].visibility||0)+(lm[11].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0),i=left?[7,11,23,25,27]:[8,12,24,26,28],ear=lm[i[0]],sh=lm[i[1]],hip=lm[i[2]],knee=lm[i[3]],ankle=lm[i[4]],h=Math.max(.2,Math.abs(ankle.y-ear.y)),head=Math.abs(ear.x-sh.x)/h,trunk=Math.abs(sh.x-hip.x)/h,kneeShift=Math.abs(knee.x-hip.x)/h,ankleShift=Math.abs(ankle.x-hip.x)/h;parts=[['頭部前後位置',clampScore(20-head*150)],['肩・胸郭位置',clampScore(20-trunk*130)],['骨盤・体幹位置',clampScore(20-(head+trunk)*55)],[type==='seated'?'股関節・膝位置':'膝の前後位置',clampScore(20-kneeShift*90)],[type==='seated'?'座位支持位置':'足部支持位置',clampScore(20-ankleShift*70)]]}const total=parts.reduce((a,p)=>a+p[1],0);return{label:type==='seated'?'座位バランススコア':'立位バランススコア',total,grade:scoreGrade(total),parts}}
@@ -194,9 +194,58 @@ function encodeResult(data){const bytes=new TextEncoder().encode(JSON.stringify(
 function decodeResult(text){let s=text.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const bin=atob(s);return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))}
 function resultUrl(data){return location.origin+location.pathname+'#result='+encodeResult(data)}
 function renderQr(id,data){const el=$(id);el.innerHTML='';if(typeof QRCode==='undefined'){el.textContent='QRコードを生成できませんでした。';return}new QRCode(el,{text:resultUrl(data),width:220,height:220,correctLevel:QRCode.CorrectLevel.M})}
-function shareData(){return{v:1,title:configs[item]?.label+'・'+plane,score:postureScore,features,note:$('interpretation').textContent||'解析結果は参考情報です。'}}
+function shareData(){return{v:2,title:configs[item]?.label+'・'+plane,score:postureScore,postureClassification,features,note:$('interpretation').textContent||'解析結果は参考情報です。'}}
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
-function openSharedResult(){if(!location.hash.startsWith('#result='))return false;try{const d=decodeResult(location.hash.slice(8));$('sharedTitle').textContent=d.title||'測定結果';$('sharedScore').innerHTML=scoreHtml(d.score);$('sharedFeatures').innerHTML=(d.features||[]).map(x=>`<div class="feature">${x}</div>`).join('');$('sharedNote').textContent=d.note||'';go(8);return true}catch(e){return false}}
+function openSharedResult(){if(!location.hash.startsWith('#result='))return false;try{const d=decodeResult(location.hash.slice(8));$('sharedTitle').textContent=d.title||'測定結果';$('sharedScore').innerHTML=scoreHtml(d.score)+postureClassificationHtml(d.postureClassification);$('sharedFeatures').innerHTML=(d.features||[]).map(x=>`<div class="feature">${x}</div>`).join('');$('sharedNote').textContent=d.note||'';go(8);return true}catch(e){return false}}
+const POSTURE_TYPES={
+ swayback:{name:'スウェイバック',summary:'力を抜きながら、身体全体で立つ様子が確認できました。',description:'骨盤まわりが前へ移動し、上半身を少し後ろへ預けやすい立ち方です。',exercise:'両足で床を感じながら、腰の上に上半身をそっと乗せるイメージで立ってみましょう。',pdf:'姿勢分類/swayback.pdf'},
+ flatback:{name:'フラットバック',summary:'身体の軸をまっすぐに保ちやすい特徴が確認できました。',description:'背中と腰のカーブが小さく、全体がまっすぐになりやすい立ち方です。',exercise:'椅子に座り、腰まわりを無理なく前後へ小さく動かしてみましょう。',pdf:'姿勢分類/flatback.pdf'},
+ lordosis:{name:'ロードシス',summary:'下半身を使って、身体をしっかり支える様子が確認できました。',description:'腰のカーブが大きくなり、骨盤が前へ傾きやすい立ち方です。',exercise:'息をゆっくり吐きながら、お腹とお尻を軽く意識して立ってみましょう。',pdf:'姿勢分類/lordosis.pdf'},
+ kypholordosis:{name:'カイホロードシス',summary:'背中と腰を使いながら、全身で姿勢を保てています。',description:'背中の丸みと腰のカーブが、どちらも大きくなりやすい立ち方です。',exercise:'胸を無理に張らず、ゆっくり呼吸しながら胸の前をやさしく開いてみましょう。',pdf:'姿勢分類/kypholordosis.pdf'}
+};
+function classifyStandingPosture(lm){
+ const left=(lm[7].visibility||0)+(lm[11].visibility||0)+(lm[23].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0)+(lm[24].visibility||0);
+ const id=left?{ear:7,shoulder:11,hip:23,knee:25,ankle:27}:{ear:8,shoulder:12,hip:24,knee:26,ankle:28};
+ const ear=lm[id.ear],sh=lm[id.shoulder],hip=lm[id.hip],knee=lm[id.knee],ankle=lm[id.ankle];
+ const h=Math.max(.2,Math.abs(ankle.y-ear.y));
+ const head=(ear.x-sh.x)/h,upper=(sh.x-hip.x)/h,pelvis=(hip.x-ankle.x)/h,kneeShift=(knee.x-ankle.x)/h;
+ let key='lordosis';
+ if(Math.abs(head)<.035&&Math.abs(upper)<.03&&Math.abs(pelvis)<.035)key='flatback';
+ else if(Math.abs(pelvis)>.05&&Math.sign(upper)!==Math.sign(pelvis))key='swayback';
+ else if(Math.abs(head)>.04&&Math.abs(upper)>.035)key='kypholordosis';
+ const base=POSTURE_TYPES[key];
+ return{key,...base,measurements:{head,upper,pelvis,kneeShift}};
+}
+function postureClassificationHtml(result){
+ if(!result)return'';
+ const href=encodeURI(result.pdf);
+ return`<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><div style="font-size:26px;font-weight:900;color:#0f5fa8;margin:8px 0 12px">${result.name}</div><p><b>今回確認できたこと</b><br>${result.summary}</p><p><b>姿勢の特徴</b><br>${result.description}</p><div class="nextAction"><b>かんたんに試せること</b><br>${result.exercise}</div><a class="btn secondary" href="${href}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none">姿勢タイプの詳しい資料を見る</a><p class="small">今回の横向き写真から、最も近い姿勢タイプを表示しています。立ち方や撮影位置によって結果は変わります。</p></div>`;
+}
+function sportBasicsText(){
+ if(item==='throw')return'基本的な投球では、足を踏み出した後、腰まわり・上半身・腕へ順番に動きがつながります。';
+ if(item==='golf')return'基本的なスイングでは、構えから腰まわり・上半身・腕へ動きがつながり、振り終わりまで身体を支えます。';
+ if(item==='squat')return'基本的なスクワットでは、足首・膝・股関節を一緒に使い、両足で床を支えながら身体を下げて戻します。';
+ return'';
+}
+function sportAdvice(){
+ const text=features.join(' ');
+ if(item==='throw'){
+  if(text.includes('肘'))return{point:'肘だけを上げようとせず、胸と肘を一緒に投げる方向へ運んでみましょう。',practice:'ボールを持たず、足・腰まわり・腕の順にゆっくり3回動いてみましょう。'};
+  if(text.includes('肩')||text.includes('骨盤')||text.includes('左右'))return{point:'腕を急いで振らず、踏み出した足のあとに身体の中心と腕が動く感覚を試してみましょう。',practice:'力を入れすぎず、半分くらいの速さで投げる動きを3回行ってみましょう。'};
+  return{point:'投げ終わりまで、足・身体の中心・腕の動きをつなげてみましょう。',practice:'ボールを持たず、ゆっくりした投球動作を3回行ってみましょう。'};
+ }
+ if(item==='golf'){
+  if(text.includes('頭部'))return{point:'頭を無理に固定せず、胸の中心を軸に身体を回してみましょう。',practice:'クラブを胸の前で持ち、胸の中心を意識して左右へゆっくり3回回ってみましょう。'};
+  if(text.includes('肩')||text.includes('骨盤')||text.includes('左右'))return{point:'腕を急いで下ろさず、腰まわりが動いたあとに腕がついてくる感覚を試してみましょう。',practice:'小さな振り幅で、腰まわりから動き始める練習を3回行ってみましょう。'};
+  return{point:'速く振るより、構えから振り終わりまで同じ流れで動くことを意識してみましょう。',practice:'振り終わりの姿勢で2秒止まれる速さで3回振ってみましょう。'};
+ }
+ if(item==='squat'){
+  if(text.includes('膝')&&text.includes('違い'))return{point:'左右を完全に同じにしようとせず、両足の裏で同じように床を感じてみましょう。',practice:'椅子へゆっくり座るように、両足で床を押しながら3回行ってみましょう。'};
+  if(text.includes('左右'))return{point:'身体の中心が片側へ寄りすぎないよう、両足に体重を乗せてみましょう。',practice:'浅めのスクワットをゆっくり3回行い、左右の足裏を確認してみましょう。'};
+  return{point:'深さを競わず、胸とお尻を一緒に動かすように身体を下げてみましょう。',practice:'後ろの椅子へ座るイメージで、ゆっくり3回行ってみましょう。'};
+ }
+ return{point:nextActionText(),practice:''};
+}
 function positiveOverview(){
  const map={
   seated:'自然に座る姿勢を確認できました。身体を支える位置を一緒に見てみましょう。',
@@ -242,7 +291,12 @@ function nextActionText(){
 function renderPositiveFeedback(targetId){
  const strengths=positiveStrengths();
  const focus=features.slice(0,2);
- $(targetId).innerHTML=`<div class="positiveSummary"><h3>今回確認できたこと</h3>${positiveOverview()}</div><div class="feedbackSection"><h3>良いところ</h3>${strengths.slice(0,3).map(x=>`<div class="feature goodFeature">✓ ${x}</div>`).join('')}</div><div class="feedbackSection"><h3>今回の動きの特徴</h3>${focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}<p class="small">身体には、一人ひとり動きやすい方向があります。良し悪しではなく、今回確認できた特徴として見てみましょう。</p></div><div class="nextAction"><b>次に試すこと</b><br>${nextActionText()}</div>`;
+ const isSport=['throw','golf','squat'].includes(item);
+ const advice=isSport?sportAdvice():{point:nextActionText(),practice:''};
+ const basics=isSport?`<div class="feedbackSection"><h3>基本的な動きと比べると</h3><p>${sportBasicsText()}</p><p>今回の映像では、できている部分を土台にしながら、上に示した特徴を少し意識すると、よりまとまりのある動きにつながります。</p></div>`:'';
+ const practice=isSport&&advice.practice?`<div class="nextAction" style="margin-top:10px"><b>かんたん練習</b><br>${advice.practice}</div>`:'';
+ const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
+ $(targetId).innerHTML=`<div class="positiveSummary"><h3>今回確認できたこと</h3>${positiveOverview()}</div>${postureCard}<div class="feedbackSection"><h3>良いところ</h3>${strengths.slice(0,3).map(x=>`<div class="feature goodFeature">✓ ${x}</div>`).join('')}</div><div class="feedbackSection"><h3>今回の動きの特徴</h3>${focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}<p class="small">一人ひとり動き方には違いがあります。良し悪しではなく、今回確認できた特徴として見てみましょう。</p></div>${basics}<div class="nextAction"><b>${isSport?'次に意識すること':'次に試すこと'}</b><br>${advice.point}</div>${practice}`;
 }
 function finishAnalysis(){$('status').classList.add('hidden');renderPositiveFeedback('analysisFeatures');$('analysisBox').classList.remove('hidden');$('resultBtn').classList.remove('hidden')}
 window.showResult=()=>{
@@ -251,7 +305,7 @@ window.showResult=()=>{
  $('postureScoreBox').innerHTML=scoreHtml(postureScore);
  $('postureScoreBox').classList.toggle('hidden',!postureScore);
  renderPositiveFeedback('resultFeatures');
- const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球フォームにはさまざまな形があります。今回の特徴を、複数回の動きを見比べるための参考にしてください。':item==='golf'?'スイングには一人ひとりの特徴があります。唯一の理想形を決めず、同じ条件での変化を見てみましょう。':'今回確認できた身体の位置と動きを表示しています。できているところを土台に、自分の身体へ関心を向けてみましょう。';
+ const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'今回の映像から、投げるときの身体の使い方を表示しています。良いところを活かし、次に意識することを一つ試してみてください。':item==='golf'?'今回の映像から、スイング中の身体の使い方を表示しています。良いところを活かし、無理のない速さで一つずつ試してみてください。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。できているところを土台に、自分の身体へ関心を向けてみましょう。';
  $('interpretation').textContent=txt;
  go(6);setTimeout(createResultQr,0)
 };
