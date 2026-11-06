@@ -128,18 +128,23 @@ function guideText(k,p){const common=`・全身または評価部位を画面内
 async function getModel(nextMode){if(!landmarker){const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');landmarker=await PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',delegate:'GPU'},runningMode:nextMode,numPoses:1,minPoseDetectionConfidence:.55,minPosePresenceConfidence:.55,minTrackingConfidence:.5});mode=nextMode}else if(mode!==nextMode){await landmarker.setOptions({runningMode:nextMode});mode=nextMode}return landmarker}
 const pairs=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[27,29],[29,31],[24,26],[26,28],[28,30],[30,32]];
 function draw(ctx,c,lm){
- ctx.lineWidth=Math.max(3,c.width/190);ctx.strokeStyle='#42d3ff';
- let drawPairs=pairs,drawIds=[0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32];
- if(plane==='矢状面'){
-  const leftIds=[7,11,13,15,23,25,27,29,31],rightIds=[8,12,14,16,24,26,28,30,32];
-  const visibleSide=ids=>ids.reduce((sum,i)=>sum+(lm[i]?.visibility||0),0);
-  const side=visibleSide(leftIds)>=visibleSide(rightIds)?'left':'right';
-  const ids=side==='left'?{ear:7,shoulder:11,elbow:13,wrist:15,hip:23,knee:25,ankle:27,heel:29,foot:31}:{ear:8,shoulder:12,elbow:14,wrist:16,hip:24,knee:26,ankle:28,heel:30,foot:32};
-  drawPairs=[[0,ids.ear],[ids.ear,ids.shoulder],[ids.shoulder,ids.elbow],[ids.elbow,ids.wrist],[ids.shoulder,ids.hip],[ids.hip,ids.knee],[ids.knee,ids.ankle],[ids.ankle,ids.heel],[ids.heel,ids.foot],[ids.ankle,ids.foot]];
-  drawIds=[0,ids.ear,ids.shoulder,ids.elbow,ids.wrist,ids.hip,ids.knee,ids.ankle,ids.heel,ids.foot];
+ ctx.lineWidth=Math.max(3,c.width/190);ctx.strokeStyle='#42d3ff';ctx.fillStyle='#ffd43b';
+ const dot=pt=>{ctx.beginPath();ctx.arc(pt.x*c.width,pt.y*c.height,Math.max(5,c.width/115),0,Math.PI*2);ctx.fill()};
+ const line=(a,b)=>{ctx.beginPath();ctx.moveTo(a.x*c.width,a.y*c.height);ctx.lineTo(b.x*c.width,b.y*c.height);ctx.stroke()};
+ const sagittalPosture=(item==='standing'||item==='seated')&&plane==='矢状面';
+ if(sagittalPosture){
+  const midpoint=(a,b)=>({x:(lm[a].x+lm[b].x)/2,y:(lm[a].y+lm[b].y)/2});
+  const visible=(i)=>(lm[i]?.visibility||0);
+  const useLeft=visible(7)+visible(11)+visible(23)+visible(25)+visible(27)>=visible(8)+visible(12)+visible(24)+visible(26)+visible(28);
+  const ear=lm[useLeft?7:8];
+  const shoulder=midpoint(11,12),elbow=midpoint(13,14),wrist=midpoint(15,16),hip=midpoint(23,24),knee=midpoint(25,26),ankle=midpoint(27,28),heel=midpoint(29,30),foot=midpoint(31,32);
+  const points=[lm[0],ear,shoulder,elbow,wrist,hip,knee,ankle,heel,foot];
+  [[lm[0],ear],[ear,shoulder],[shoulder,elbow],[elbow,wrist],[shoulder,hip],[hip,knee],[knee,ankle],[ankle,heel],[heel,foot],[ankle,foot]].forEach(([a,b])=>line(a,b));
+  points.forEach(dot);
+  return;
  }
- drawPairs.forEach(([a,b])=>{if(!lm[a]||!lm[b])return;ctx.beginPath();ctx.moveTo(lm[a].x*c.width,lm[a].y*c.height);ctx.lineTo(lm[b].x*c.width,lm[b].y*c.height);ctx.stroke()});
- ctx.fillStyle='#ffd43b';drawIds.forEach(i=>{if(!lm[i])return;ctx.beginPath();ctx.arc(lm[i].x*c.width,lm[i].y*c.height,Math.max(5,c.width/115),0,Math.PI*2);ctx.fill()})
+ pairs.forEach(([a,b])=>line(lm[a],lm[b]));
+ [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32].forEach(i=>dot(lm[i]));
 }
 function angle(a,b,c){const u={x:a.x-b.x,y:a.y-b.y},v={x:c.x-b.x,y:c.y-b.y};return Math.acos(Math.max(-1,Math.min(1,(u.x*v.x+u.y*v.y)/(Math.hypot(u.x,u.y)*Math.hypot(v.x,v.y)||1))))*180/Math.PI}
 function visibility(lm){const ids=[11,12,23,24,25,26,27,28];return Math.round(ids.reduce((s,i)=>s+(lm[i].visibility||0),0)/ids.length*100)}
