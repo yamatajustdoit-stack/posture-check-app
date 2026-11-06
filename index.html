@@ -127,7 +127,20 @@ function selectPlane(p){plane=p;const c=configs[item];$('captureTitle').textCont
 function guideText(k,p){const common=`・全身または評価部位を画面内に入れる<br>・カメラを固定し、傾けない<br>・背景に別の人を入れない<br>・撮影面：${p}<br>`;const x={seated:'・足裏を床につけ自然に座る',standing:'・胸を張るよう指示せず自然に立つ',standup:'・椅子と全身を入れ自然に立ち上がる',gait:'・カメラへ向かって片道歩行する',stairs:'・段差全体と全身を入れる',squat:'・2〜3回ゆっくり行う',single:'・安全を確保して数秒保持する',throw:'・スローモーション推奨。投球全体を入れる',golf:'・スローモーション推奨。クラブを含め安全距離を取る'}[k];return common+x}
 async function getModel(nextMode){if(!landmarker){const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');landmarker=await PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',delegate:'GPU'},runningMode:nextMode,numPoses:1,minPoseDetectionConfidence:.55,minPosePresenceConfidence:.55,minTrackingConfidence:.5});mode=nextMode}else if(mode!==nextMode){await landmarker.setOptions({runningMode:nextMode});mode=nextMode}return landmarker}
 const pairs=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[27,29],[29,31],[24,26],[26,28],[28,30],[30,32]];
-function draw(ctx,c,lm){ctx.lineWidth=Math.max(3,c.width/190);ctx.strokeStyle='#42d3ff';pairs.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(lm[a].x*c.width,lm[a].y*c.height);ctx.lineTo(lm[b].x*c.width,lm[b].y*c.height);ctx.stroke()});ctx.fillStyle='#ffd43b';[0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32].forEach(i=>{ctx.beginPath();ctx.arc(lm[i].x*c.width,lm[i].y*c.height,Math.max(5,c.width/115),0,Math.PI*2);ctx.fill()})}
+function draw(ctx,c,lm){
+ ctx.lineWidth=Math.max(3,c.width/190);ctx.strokeStyle='#42d3ff';
+ let drawPairs=pairs,drawIds=[0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32];
+ if(plane==='矢状面'){
+  const leftIds=[7,11,13,15,23,25,27,29,31],rightIds=[8,12,14,16,24,26,28,30,32];
+  const visibleSide=ids=>ids.reduce((sum,i)=>sum+(lm[i]?.visibility||0),0);
+  const side=visibleSide(leftIds)>=visibleSide(rightIds)?'left':'right';
+  const ids=side==='left'?{ear:7,shoulder:11,elbow:13,wrist:15,hip:23,knee:25,ankle:27,heel:29,foot:31}:{ear:8,shoulder:12,elbow:14,wrist:16,hip:24,knee:26,ankle:28,heel:30,foot:32};
+  drawPairs=[[0,ids.ear],[ids.ear,ids.shoulder],[ids.shoulder,ids.elbow],[ids.elbow,ids.wrist],[ids.shoulder,ids.hip],[ids.hip,ids.knee],[ids.knee,ids.ankle],[ids.ankle,ids.heel],[ids.heel,ids.foot],[ids.ankle,ids.foot]];
+  drawIds=[0,ids.ear,ids.shoulder,ids.elbow,ids.wrist,ids.hip,ids.knee,ids.ankle,ids.heel,ids.foot];
+ }
+ drawPairs.forEach(([a,b])=>{if(!lm[a]||!lm[b])return;ctx.beginPath();ctx.moveTo(lm[a].x*c.width,lm[a].y*c.height);ctx.lineTo(lm[b].x*c.width,lm[b].y*c.height);ctx.stroke()});
+ ctx.fillStyle='#ffd43b';drawIds.forEach(i=>{if(!lm[i])return;ctx.beginPath();ctx.arc(lm[i].x*c.width,lm[i].y*c.height,Math.max(5,c.width/115),0,Math.PI*2);ctx.fill()})
+}
 function angle(a,b,c){const u={x:a.x-b.x,y:a.y-b.y},v={x:c.x-b.x,y:c.y-b.y};return Math.acos(Math.max(-1,Math.min(1,(u.x*v.x+u.y*v.y)/(Math.hypot(u.x,u.y)*Math.hypot(v.x,v.y)||1))))*180/Math.PI}
 function visibility(lm){const ids=[11,12,23,24,25,26,27,28];return Math.round(ids.reduce((s,i)=>s+(lm[i].visibility||0),0)/ids.length*100)}
 $('captureInput').addEventListener('change',()=>{const f=$('captureInput').files[0];if(!f)return;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(f);features=[];qualityScore=0;postureScore=null;postureClassification=null;sportResult=null;$('analysisBox').classList.add('hidden');$('resultBtn').classList.add('hidden');if(configs[item].kind==='image'){const img=new Image();img.onload=()=>analyzeImage(img);img.src=objectURL}else{loadVideo(objectURL)}go(5)});
@@ -139,23 +152,54 @@ function scoreBand(v){return v>=85?{label:'全体として整っています',to
 function scoreHtml(x){
  if(!x)return'';
  const band=scoreBand(x.total);
- const postureGood=(x.label||'').includes('座位')
-  ?'足元で身体を支えながら、座った姿勢を保てています。'
-  :'両足で身体を支えながら、立った姿勢を保てています。';
- return`<div class="scoreCard"><div class="scoreHeadline">${(x.label||'姿勢').replace('スコア','')}｜今回の整い度</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div><div class="scoreNote"><b>今回確認できた良いところ</b><br>${postureGood}</div><p class="small">「今回の整い度」は、写真内の身体の位置関係を数値化した参考表示です。撮影角度、距離、服装、明るさでも変わります。</p>`;
+ return`<div class="scoreCard"><div class="scoreHeadline">${(x.label||'姿勢').replace('スコア','')}｜今回の整い度</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div><p class="small">「今回の整い度」は、写真内の身体の位置関係を数値化した参考表示です。撮影角度、距離、服装、明るさでも変わります。</p>`;
+}
+function postureDetailedFeatures(lm,type,view){
+ const out=[];
+ if(view==='前額面'){
+  const shoulderDiff=lm[11].y-lm[12].y,hipDiff=lm[23].y-lm[24].y,kneeDiff=lm[25].y-lm[26].y;
+  const shoulderX=(lm[11].x+lm[12].x)/2,hipX=(lm[23].x+lm[24].x)/2;
+  const headShift=lm[0].x-shoulderX,trunkShift=shoulderX-hipX;
+  const altered=[];
+  if(Math.abs(headShift)>.018)altered.push(`頭が身体の中心より画像上で${headShift>0?'右':'左'}側に位置しています`);
+  if(Math.abs(shoulderDiff)>.018)altered.push(`画像上で${shoulderDiff>0?'左':'右'}肩が低く、肩の高さに左右差があります`);
+  if(Math.abs(hipDiff)>.018)altered.push(`画像上で${hipDiff>0?'左':'右'}の骨盤付近が低く、骨盤の高さに左右差があります`);
+  if(Math.abs(trunkShift)>.024)altered.push(`肩の中心が骨盤の中心より画像上で${trunkShift>0?'右':'左'}側にあり、上半身が横へずれています`);
+  if(Math.abs(kneeDiff)>.025)altered.push(`画像上で${kneeDiff>0?'左':'右'}膝が低く、脚の位置に左右差があります`);
+  const aligned=[];
+  if(Math.abs(headShift)<=.018)aligned.push('頭は肩の中心付近');
+  if(Math.abs(shoulderDiff)<=.018)aligned.push('左右の肩の高さ');
+  if(Math.abs(hipDiff)<=.018)aligned.push('骨盤付近の高さ');
+  if(Math.abs(trunkShift)<=.024)aligned.push('肩と骨盤の中心');
+  if(Math.abs(kneeDiff)<=.025)aligned.push(type==='seated'?'左右の膝の高さ':'左右の脚の位置');
+  if(altered.length)out.push(altered.slice(0,2).join('。')+'。');
+  else out.push('頭・肩・骨盤・脚の位置に、大きな左右のずれは見られませんでした。');
+  if(aligned.length)out.push(aligned.slice(0,3).join('、')+'は、おおむね揃っています。');
+ }else{
+  const left=(lm[7].visibility||0)+(lm[11].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0);
+  const ids=left?[7,11,23,25,27]:[8,12,24,26,28],ear=lm[ids[0]],sh=lm[ids[1]],hip=lm[ids[2]],knee=lm[ids[3]],ankle=lm[ids[4]];
+  const h=Math.max(.2,Math.abs(ankle.y-ear.y));
+  const facing=(lm[0].x-ear.x)>=0?1:-1;
+  const head=(ear.x-sh.x)*facing/h,trunk=(sh.x-hip.x)*facing/h,pelvis=(hip.x-ankle.x)*facing/h,kneePos=(knee.x-ankle.x)*facing/h;
+  const altered=[];
+  if(Math.abs(head)>.04)altered.push(`頭が肩より${head>0?'前':'後ろ'}に位置しています`);
+  if(Math.abs(trunk)>.04)altered.push(`肩が骨盤付近より${trunk>0?'前':'後ろ'}に位置し、上半身の前後位置に特徴があります`);
+  if(Math.abs(pelvis)>.05)altered.push(`骨盤付近が足元より${pelvis>0?'前':'後ろ'}に位置しています`);
+  if(Math.abs(kneePos)>.07)altered.push(`膝が足元より${kneePos>0?'前':'後ろ'}に位置しています`);
+  const aligned=[];
+  if(Math.abs(head)<=.04)aligned.push('頭と肩');
+  if(Math.abs(trunk)<=.04)aligned.push('肩と骨盤付近');
+  if(Math.abs(pelvis)<=.05)aligned.push('骨盤付近と足元');
+  if(Math.abs(kneePos)<=.07)aligned.push('膝と足元');
+  if(altered.length)out.push(altered.slice(0,2).join('。')+'。');
+  else out.push('頭・肩・骨盤・足元の前後位置に、大きなずれは見られませんでした。');
+  if(aligned.length)out.push(aligned.slice(0,3).join('、')+'の前後位置は、おおむね整っています。');
+ }
+ return out.slice(0,3);
 }
 function staticFeatures(lm){
- const out=[];
- if(plane==='前額面'){
-  if(Math.abs(lm[11].y-lm[12].y)>.018)out.push('肩の位置に左右それぞれの特徴が見られました');
-  if(Math.abs(lm[23].y-lm[24].y)>.018)out.push('骨盤付近の位置に左右の違いが見られました');
- }else{
-  const left=(lm[7].visibility||0)+(lm[11].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0),ids=left?[7,11,23,27]:[8,12,24,28],ear=lm[ids[0]],sh=lm[ids[1]],hip=lm[ids[2]],ankle=lm[ids[3]],h=Math.max(.2,ankle.y-ear.y);
-  if(Math.abs(ear.x-sh.x)/h>.04)out.push('頭部と肩の前後位置に、その人らしい特徴が見られました');
-  if(Math.abs(sh.x-hip.x)/h>.035)out.push('肩と骨盤付近の前後位置に違いが見られました');
- }
- if(!out.length)out.push('身体の主要な位置関係は、おおむね整って確認できました');
- return out
+ if(item==='standing'||item==='seated')return postureDetailedFeatures(lm,item,plane);
+ return['身体の主要な位置関係を確認できました'];
 }
 async function loadVideo(url){$('imageWrap').classList.add('hidden');$('videoWrap').classList.remove('hidden');const v=$('motionVideo');if(controller){controller.dispose();controller=null}v.src=url;v.load();$('startBtn').classList.remove('hidden');$('startBtn').onclick=async()=>{if(!controller)await setupVideoController();globalSamples=[];await controller.startFromBeginning()};$('status').textContent='動画を読み込みました。「先頭から解析する」を押してください。'}
 function collectFrame(lm,t,target){
@@ -283,7 +327,7 @@ function resultUrl(data){return location.origin+location.pathname+'#result='+enc
 function renderQr(id,data){const el=$(id);el.innerHTML='';if(typeof QRCode==='undefined'){el.textContent='QRコードを生成できませんでした。';return}new QRCode(el,{text:resultUrl(data),width:220,height:220,correctLevel:QRCode.CorrectLevel.Q})}
 function shareData(){
  const compactScore=postureScore?{label:postureScore.label,total:postureScore.total}:null;
- return{v:4,i:item,p:plane,s:compactScore,t:postureClassification?.key||'',f:features.slice(0,2),r:sportResult?{score:sportResult.score,phase:sportResult.phase,feature:sportResult.feature,comparison:sportResult.comparison}:null};
+ return{v:4,i:item,p:plane,s:compactScore,t:postureClassification?.key||'',f:features.slice(0,(item==='standing'||item==='seated')?3:2),r:sportResult?{score:sportResult.score,phase:sportResult.phase,feature:sportResult.feature,comparison:sportResult.comparison}:null};
 }
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
 function openSharedResult(){
@@ -295,7 +339,7 @@ function openSharedResult(){
   const sharedType=d.t&&POSTURE_TYPES[d.t]?{key:d.t,...POSTURE_TYPES[d.t]}:d.postureClassification;
   $('sharedTitle').textContent=title;
   $('sharedScore').innerHTML=scoreHtml(d.s||d.score)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
-  $('sharedFeatures').innerHTML=(d.f||d.features||[]).slice(0,2).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+  $('sharedFeatures').innerHTML=(d.f||d.features||[]).slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   $('sharedNote').textContent='今回の写真から確認できた姿勢の特徴です。姿勢の良し悪しや病気を判断するものではありません。';
   go(8);return true;
  }catch(e){return false}
@@ -343,13 +387,13 @@ function nextActionText(){
  return map[item]||'同じ撮影条件でもう一度行い、違いを見比べてみましょう。';
 }
 function renderPositiveFeedback(targetId){
- const focus=features.slice(0,2);
  const postureItem=item==='standing'||item==='seated';
+ const focus=postureItem?features.slice(0,3):features.slice(0,2);
  if(postureItem){
   const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
   const heading=item==='standing'?'今回の立ち姿勢の特徴':'今回の座り姿勢の特徴';
   const featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
-  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}<p class="small">今回の写真から確認できた身体の位置関係です。姿勢の良し悪しではなく、その人の特徴としてご覧ください。</p></div>`;return;
+  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}<p class="small">写真上の身体の並び方を示した参考情報です。撮影角度や立ち方・座り方によって結果は変わります。</p></div>`;return;
  }
  if(item==='throw'||item==='golf'){$(targetId).innerHTML=sportResult?sportResultHtml(sportResult):'<div class="status">撮影条件を整えると、フェーズごとの特徴を確認できます。</div>';return}
  const strengths=positiveStrengths();
@@ -366,8 +410,10 @@ window.showResult=()=>{
  $('postureScoreBox').innerHTML=scoreHtml(postureScore);
  $('postureScoreBox').classList.toggle('hidden',!postureScore);
  renderPositiveFeedback('resultFeatures');
- const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。できているところを土台に、自分の身体へ関心を向けてみましょう。';
+ const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
  $('interpretation').textContent=txt;
+ const hideInterpretation=item==='standing'||item==='seated';
+ $('interpretation').classList.toggle('hidden',hideInterpretation);
  go(6);setTimeout(createResultQr,0)
 };
 
