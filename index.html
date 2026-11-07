@@ -19,7 +19,7 @@
 <section class="screen" id="s3"><button class="back" onclick="go(2)">← 項目選択へ</button><h1 id="planeTitle">撮影面を選択</h1><div class="planeGrid" id="planes"></div></section>
 <section class="screen" id="s4"><button class="back" onclick="go(3)">← 撮影面選択へ</button><h1 id="captureTitle"></h1><div class="card"><div class="box" id="guide"></div><input capture="environment" id="captureInput" type="file"/><button class="btn" id="captureBtn">撮影する</button></div></section>
 <section class="screen" id="s5"><button class="back" onclick="go(4)">← 撮影へ</button><h1>自動解析</h1><div class="card"><div class="imageStage hidden" id="imageWrap"><canvas id="imageCanvas"></canvas></div><div class="videoStage hidden" id="videoWrap"><video controls="" id="motionVideo" muted="" playsinline=""></video><canvas id="videoCanvas"></canvas></div><div class="status" id="status">撮影データを読み込んでください。</div><button class="btn hidden" id="startBtn">先頭から解析する</button><div class="hidden" id="analysisBox"><h2>今回の良いところと特徴</h2><div id="analysisFeatures"></div></div><button class="btn hidden" id="resultBtn" onclick="showResult()">結果を見る</button><button class="btn secondary" onclick="captureInput.click()">撮り直す</button></div></section>
-<section class="screen" id="s6"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span class="pill" id="quality"></span><div class="hidden" id="postureScoreBox"></div><div id="resultFeatures"></div><div class="resultBox" id="interpretation"></div><p class="small">できているところと今回の特徴を確認するための参考情報です。撮影条件によって結果は変わります。</p><div class="qrBox hidden" id="resultQrBox"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div class="qrCanvas" id="resultQr"></div></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
+<section class="screen" id="s6"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span class="pill" id="quality"></span><div class="hidden" id="postureScoreBox"></div><div id="resultFeatures"></div><div class="resultBox" id="interpretation"></div><p class="small" id="resultReferenceNote">今回の結果は、撮影時の身体の位置や動きの特徴を示す参考情報であり、撮影条件によって変わります。</p><div class="qrBox hidden" id="resultQrBox"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div class="qrCanvas" id="resultQr"></div></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
 <section class="screen" id="s7">
 <button class="back" onclick="go(2)">← 項目選択へ</button>
 <h1>足の測定・靴の提案</h1>
@@ -247,7 +247,7 @@ function classifyStandingPosture(lm){
 function postureClassificationHtml(result){
  if(!result)return'';
  const href=encodeURI(result.pdf);
- return`<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><div style="font-size:26px;font-weight:900;color:#0f5fa8;margin:8px 0 12px">${result.name}</div><p><b>姿勢タイプの特徴</b><br>${result.description}</p><a class="btn secondary" href="${href}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none">姿勢タイプの詳しい資料を見る</a><p class="small">今回の横向き写真から、最も近い姿勢タイプを表示しています。立ち方や撮影位置によって結果は変わります。</p></div>`;
+ return`<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><div style="font-size:26px;font-weight:900;color:#0f5fa8;margin:8px 0 12px">${result.name}</div><p><b>姿勢タイプの特徴</b><br>${result.description}</p><a class="btn secondary" href="${href}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none">姿勢タイプの詳しい資料を見る</a></div>`;
 }
 
 const SPORT_PHASES={
@@ -410,7 +410,7 @@ function renderPositiveFeedback(targetId){
   const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
   const heading=item==='standing'?'今回の立ち姿勢の特徴':'今回の座り姿勢の特徴';
   const featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
-  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}<p class="small">写真上の身体の並び方を示した参考情報です。撮影角度や立ち方・座り方によって結果は変わります。</p></div>`;return;
+  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>`;return;
  }
  if(item==='throw'||item==='golf'){$(targetId).innerHTML=sportResult?sportResultHtml(sportResult):'<div class="status">撮影条件を整えると、フェーズごとの特徴を確認できます。</div>';return}
  const strengths=positiveStrengths();
@@ -429,7 +429,11 @@ window.showResult=()=>{
  renderPositiveFeedback('resultFeatures');
  const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
  $('interpretation').textContent=txt;
- const hideInterpretation=item==='standing'||item==='seated';
+ const postureResult=item==='standing'||item==='seated';
+ $('resultReferenceNote').textContent=postureResult
+  ?'今回の結果は、写真上の身体の並び方と最も近い姿勢タイプを示す参考情報であり、撮影角度や立ち方・座り方によって変わります。'
+  :'今回の結果は、撮影時の身体の位置や動きの特徴を示す参考情報であり、撮影条件によって変わります。';
+ const hideInterpretation=postureResult;
  $('interpretation').classList.toggle('hidden',hideInterpretation);
  go(6);setTimeout(createResultQr,0)
 };
