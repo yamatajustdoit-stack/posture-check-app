@@ -157,7 +157,7 @@ function scoreBand(v){return v>=85?{label:'全体として整っています',to
 function scoreHtml(x){
  if(!x)return'';
  const band=scoreBand(x.total);
- return`<div class="scoreCard"><div class="scoreHeadline">${(x.label||'姿勢').replace('スコア','')}｜今回の整い度</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div><p class="small">「今回の整い度」は、写真内の身体の位置関係を数値化した参考表示です。撮影角度、距離、服装、明るさでも変わります。</p>`;
+ return`<div class="scoreCard"><div class="scoreHeadline">${(x.label||'姿勢').replace('スコア','')}｜今回の整い度</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div>`;
 }
 function postureDetailedFeatures(lm,type,view){
  const out=[];
@@ -431,7 +431,7 @@ window.showResult=()=>{
  $('interpretation').textContent=txt;
  const postureResult=item==='standing'||item==='seated';
  $('resultReferenceNote').textContent=postureResult
-  ?'今回の結果は、写真上の身体の並び方と最も近い姿勢タイプを示す参考情報であり、撮影角度や立ち方・座り方によって変わります。'
+  ?'「今回の整い度」と姿勢タイプは、写真上の身体の位置関係を数値化・分類した参考表示であり、撮影角度、距離、服装、明るさ、立ち方・座り方によって変わります。'
   :'今回の結果は、撮影時の身体の位置や動きの特徴を示す参考情報であり、撮影条件によって変わります。';
  const hideInterpretation=postureResult;
  $('interpretation').classList.toggle('hidden',hideInterpretation);
