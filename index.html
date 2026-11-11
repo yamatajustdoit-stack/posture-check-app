@@ -104,7 +104,7 @@ window.toggleVoiceRecording=async()=>{if(voiceRecorder&&voiceRecorder.state==='r
 </script>
 <script type="module">
 
-import{FilesetResolver,PoseLandmarker}from"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/+esm";
+import{FilesetResolver,PoseLandmarker}from"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/+esm";
 const $=id=>document.getElementById(id);
 const configs={
  foot:{label:"足の測定・靴の提案",planes:[],kind:"foot",desc:"足長・足囲・足幅と足型から試着候補"},
@@ -131,7 +131,7 @@ async function closePoseModel(){
  mode="";
 }
 async function createPoseModel(nextMode,delegate){
- const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');
+ const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0/wasm');
  return PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',delegate},runningMode:nextMode,numPoses:1,minPoseDetectionConfidence:.55,minPosePresenceConfidence:.55,minTrackingConfidence:.5});
 }
 async function getModel(nextMode){
@@ -578,7 +578,7 @@ function renderPositiveFeedback(targetId){
  const ev=movementEvaluation(item);
  $(targetId).innerHTML=`<div class="feedbackSection"><h3>今回の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
 }
-function finishAnalysis(){$('status').classList.add('hidden');$('status').innerHTML='';renderPositiveFeedback('analysisFeatures');$('analysisBox').classList.remove('hidden');$('resultBtn').classList.remove('hidden');$('resultBtn').disabled=false;$('analysisBox').scrollIntoView({behavior:'smooth',block:'start'})}
+function finishAnalysis(){$('status').classList.add('hidden');$('status').innerHTML='';renderPositiveFeedback('analysisFeatures');$('analysisBox').classList.remove('hidden');$('resultBtn').classList.remove('hidden');$('resultBtn').disabled=false;$('analysisBox').scrollIntoView({behavior:'smooth',block:'start'});if(item==='seated'||item==='standing'){setTimeout(()=>window.showResult(),350)}}
 window.showResult=()=>{
  $('resultTitle').textContent=configs[item].label+'・'+plane;
  $('quality').textContent='撮影状態：'+(qualityScore>=80?'分かりやすく撮影できました':qualityScore>=60?'特徴を確認できました':'撮影条件を整えると、さらに分かりやすくなります');
