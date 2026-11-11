@@ -593,7 +593,7 @@ function renderStandingImmediateResult(){
  const detail=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
  const detailHtml=(detail&&detail.length?detail:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  const score=postureScore?scoreHtml(postureScore):'';
- target.innerHTML=`${classification}${score}<div class="feedbackSection"><h3>撮影後の姿勢フィードバック</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${nextActionText()}</div>`;
+ target.innerHTML=`${score}${classification}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
 }
 
 function finishAnalysis(){
@@ -635,7 +635,7 @@ function showResult(){
     }
     const candidateHtml=plane==='矢状面'
      ?(postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>')
-     :'<div class="resultBox"><h2>今回の姿勢の候補</h2><p>前額面では姿勢タイプ分類を行わず、全身の左右差を確認します。</p></div>';
+     :'';
     const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
     const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
     $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
