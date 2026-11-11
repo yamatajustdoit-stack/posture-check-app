@@ -593,7 +593,7 @@ function renderStandingImmediateResult(){
  const detail=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
  const detailHtml=(detail&&detail.length?detail:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  const score=postureScore?scoreHtml(postureScore):'';
- target.innerHTML=`${score}${classification}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${nextActionText()}</div>`;
+ target.innerHTML=`${classification}${score}<div class="feedbackSection"><h3>撮影後の姿勢フィードバック</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${nextActionText()}</div>`;
 }
 
 function finishAnalysis(){
@@ -627,7 +627,22 @@ function showResult(){
   showScore=normalizeResultScore(showScore);
   $('postureScoreBox').innerHTML=scoreHtml(showScore);
   $('postureScoreBox').classList.toggle('hidden',!showScore);
-  try{renderPositiveFeedback('resultFeatures')}catch(e){console.error('Result feedback render failed',e);$('resultFeatures').innerHTML='<div class="status">ランドマークは検出できました。結果の詳細表示を再読み込みしています。</div>'}
+  try{
+   if(item==='standing'){
+    const lm=lastStillLandmarks;
+    if(plane==='矢状面'&&!postureClassification&&lm){
+     try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing result classification failed',e)}
+    }
+    const candidateHtml=plane==='矢状面'
+     ?(postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>')
+     :'<div class="resultBox"><h2>今回の姿勢の候補</h2><p>前額面では姿勢タイプ分類を行わず、全身の左右差を確認します。</p></div>';
+    const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
+    const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+    $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
+   }else{
+    renderPositiveFeedback('resultFeatures');
+   }
+  }catch(e){console.error('Result feedback render failed',e);$('resultFeatures').innerHTML='<div class="status">ランドマークは検出できました。結果の詳細表示を再読み込みしています。</div>'}
   const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
   $('interpretation').textContent=txt;
   const postureResult=item==='standing'||item==='seated';
