@@ -445,7 +445,7 @@ function sportResultHtml(r){
  const label=r.score>=85?'基本動作に近い流れです':r.score>=70?'基本動作におおむね近い流れです':'今回、特徴が見られた動きがあります';
  const meaningful=(r.feature||'').includes('確認できました')&&!(r.feature||'').includes('違い')?'今回の映像では、大きく目立つ違いは確認されませんでした。':r.feature;
  const action=r.action||sportAction(r.kind||item,r);
- return`<div class="sportScore"><h3>基本動作との一致度</h3><div class="sportScoreNumber">${r.score}<span>％</span></div><p>${label}</p></div><div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>今回の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
+ return`<div class="sportScore"><h3>基本動作との一致度</h3><div class="sportScoreNumber">${r.score}<span>％</span></div><p>${label}</p></div><div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>動作の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
 }
 function encodeResult(data){
  const json=JSON.stringify(data);
@@ -573,10 +573,10 @@ function renderPositiveFeedback(targetId){
   const ev=movementEvaluation(item);
   if(!ev.score){$(targetId).innerHTML=`<div class="status"><b>解析結果を作成できませんでした。</b><br>${ev.action}</div>`;return}
   const label=item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度';
-  $(targetId).innerHTML=`${scoreHtml({score:ev.score,label})}<div class="feedbackSection"><h3>今回の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;return;
+  $(targetId).innerHTML=`${scoreHtml({score:ev.score,label})}<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;return;
  }
  const ev=movementEvaluation(item);
- $(targetId).innerHTML=`<div class="feedbackSection"><h3>今回の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
+ $(targetId).innerHTML=`<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
 }
 function renderLandmarkVisualForResult(){
  const wrap=$('resultVisualWrap'),out=$('resultVisualCanvas');if(!wrap||!out)return;const oc=out.getContext('2d');
@@ -628,19 +628,29 @@ function showResult(){
   $('postureScoreBox').innerHTML=scoreHtml(showScore);
   $('postureScoreBox').classList.toggle('hidden',!showScore);
   try{
-   if(item==='standing'){
+   if(item==='standing'||item==='seated'){
     const lm=lastStillLandmarks;
-    if(plane==='矢状面'&&!postureClassification&&lm){
-     try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing result classification failed',e)}
+    let candidateHtml='';
+    if(item==='standing'&&plane==='矢状面'){
+     if(!postureClassification&&lm){
+      try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing result classification failed',e)}
+     }
+     candidateHtml=postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>';
     }
-    const candidateHtml=plane==='矢状面'
-     ?(postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>')
-     :'<div class="resultBox"><h2>今回の姿勢の候補</h2><p>前額面では姿勢タイプ分類を行わず、全身の左右差を確認します。</p></div>';
-    const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
-    const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+    const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,item,plane):[];
+    let featureItems=details;
+    if((!featureItems||!featureItems.length)&&item==='seated'){
+     const ev=movementEvaluation('seated');
+     if(ev&&ev.feature)featureItems=[ev.feature];
+    }
+    const detailHtml=(featureItems&&featureItems.length?featureItems:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
     $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
    }else{
     renderPositiveFeedback('resultFeatures');
+    if(!$('resultFeatures').innerHTML.trim()){
+     const ev=movementEvaluation(item);
+     $('resultFeatures').innerHTML=`<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature||'今回の動作を確認しました。'}</div></div>`;
+    }
    }
   }catch(e){console.error('Result feedback render failed',e);$('resultFeatures').innerHTML='<div class="status">ランドマークは検出できました。結果の詳細表示を再読み込みしています。</div>'}
   const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
