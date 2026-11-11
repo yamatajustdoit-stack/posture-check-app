@@ -553,71 +553,6 @@ function nextActionText(){
  };
  return map[item]||'同じ撮影条件でもう一度行い、違いを見比べてみましょう。';
 }
-function pdfBasedFeedbackHtml(kind=item,view=plane){
- const note='<p class="small">写真・動画から確認できた位置関係と動きに基づく参考情報です。痛みや疾患を判定するものではありません。同じ条件での再撮影や左右差・過去結果との比較に活用してください。</p>';
- let title=kind==='standing'||kind==='seated'?'姿勢フィードバック':'動作フィードバック';
- let points=[];
- if(kind==='standing'&&view==='前額面')points=[
-  '頭部、肩、骨盤、膝の左右の高さと、身体の縦のラインを順に確認します。',
-  '左右差が見られた部位だけでなく、そろっている部位も良い点として確認しましょう。',
-  '足幅、立つ位置、カメラの傾きをそろえて再撮影すると変化を比べやすくなります。'
- ];
- else if(kind==='standing'&&view==='矢状面')points=[
-  '足首を基準に、耳、肩、股関節、膝の前後位置を上から順に確認します。',
-  '姿勢タイプ候補は全身の位置関係をまとめた参考表示です。各部位の特徴と一緒に確認してください。',
-  '肩の力を抜いた普段どおりの立ち方で再撮影し、位置関係の変化を比べましょう。'
- ];
- else if(kind==='seated')points=[
-  '頭部と肩、骨盤の左右差、上半身の前後位置、足底の接地を確認します。',
-  '椅子の中央に座り、左右のお尻と足裏で均等に支えられているか見比べましょう。',
-  '椅子やカメラの位置をそろえて再撮影すると、座り方の変化を確認しやすくなります。'
- ];
- else if(kind==='gait')points=[
-  '歩行は「前へ進む動き」「上下動の安定性」「左右差」の3つに分けて確認します。',
-  '歩幅やテンポだけでなく、頭・体幹の上下動と、左右の足の上がり方も見比べましょう。',
-  '同じ靴、距離、歩く速さ、撮影方向で繰り返すと変化を比較しやすくなります。'
- ];
- else if(kind==='stairs')points=[
-  '段差へ足を運ぶ場面、身体を持ち上げる場面、次の一歩へ移る場面に分けて確認します。',
-  '左右の膝の曲がり方、体幹の傾き、足の上がり方の違いを見比べましょう。',
-  '安全を優先し、同じ段差と撮影方向で比較してください。'
- ];
- else if(kind==='squat')points=[
-  '開始姿勢、最も深くしゃがんだ場面、立ち上がる場面に分けて確認します。',
-  '膝・股関節の曲がり方、体幹の傾き、左右差を見比べましょう。',
-  '深さを競わず、同じ足幅と速さで繰り返すと変化を比較しやすくなります。'
- ];
- else if(kind==='standup')points=[
-  '身体を前へ移す場面、お尻が座面から離れる場面、立位が安定する場面を確認します。',
-  '体幹の前傾、左右の膝の使い方、立った後の安定性を見比べましょう。',
-  '椅子の高さと足の位置をそろえて比較してください。'
- ];
- else if(kind==='single')points=[
-  '片脚で支えた直後、保持中、足を戻す場面を確認します。',
-  '頭・体幹・骨盤の傾きと、支えている膝の位置を見比べましょう。',
-  '転倒しない環境を確保し、保持時間よりも安全と再現性を優先してください。'
- ];
- else if(kind==='throw')points=[
-  '踏み出し、前足接地、ボールを放す場面、投げ終わりの順に確認します。',
-  '体幹の回転、肩と肘の位置、左右の足への体重移動を場面ごとに見比べましょう。',
-  '同じ方向・距離・速度で複数回撮影し、共通して現れる特徴を確認してください。'
- ];
- else if(kind==='golf')points=[
-  '構え、振り上げ、切り返し、ボール付近を通る場面、振り終わりの順に確認します。',
-  '頭部の位置、体幹と骨盤の回転順序、左右の足への体重移動を見比べましょう。',
-  '同じクラブ、構え、撮影位置で複数回比較してください。'
- ];
- else points=[
-  '動作を開始・中間・終了の場面に分け、身体各部の位置関係を確認します。',
-  '左右差、動く順序、安定している場面を見比べましょう。',
-  '同じ撮影条件で繰り返し、過去の結果との変化に活用してください。'
- ];
- return `<div class="feedbackSection pdfBasedFeedback"><h3>${title}の見方</h3>${points.map(x=>`<div class="feature goodFeature">・${x}</div>`).join('')}${note}</div>`;
-}
-function appendPdfBasedFeedback(targetId){
- const target=$(targetId);if(!target||target.querySelector('.pdfBasedFeedback'))return;
- target.insertAdjacentHTML('beforeend',pdfBasedFeedbackHtml());
-}
 function renderPositiveFeedback(targetId){
  const postureItem=item==='standing'||item==='seated';
  const focus=focusFeatures();
@@ -664,7 +599,7 @@ function renderStandingImmediateResult(){
 function finishAnalysis(){
  const status=$('status'),box=$('analysisBox'),btn=$('resultBtn');
  if(status){status.classList.add('hidden');status.innerHTML=''}
- try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures');appendPdfBasedFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
+ try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
  if(box)box.classList.remove('hidden');
  if(btn){btn.classList.remove('hidden');btn.disabled=false}
  if(box)box.scrollIntoView({behavior:'smooth',block:'start'});
@@ -707,7 +642,6 @@ function showResult(){
    }else{
     renderPositiveFeedback('resultFeatures');
    }
-   appendPdfBasedFeedback('resultFeatures');
   }catch(e){console.error('Result feedback render failed',e);$('resultFeatures').innerHTML='<div class="status">ランドマークは検出できました。結果の詳細表示を再読み込みしています。</div>'}
   const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
   $('interpretation').textContent=txt;
