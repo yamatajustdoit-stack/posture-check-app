@@ -19,7 +19,7 @@
 <section class="screen" id="s3"><button class="back" onclick="go(2)">← 項目選択へ</button><h1 id="planeTitle">撮影面を選択</h1><div class="planeGrid" id="planes"></div></section>
 <section class="screen" id="s4"><button class="back" onclick="go(3)">← 撮影面選択へ</button><h1 id="captureTitle"></h1><div class="card"><div class="box" id="guide"></div><label class="btn fileCaptureBtn" id="captureBtn"><span id="captureBtnText">写真を撮影する</span><input accept="image/*" capture="environment" id="captureInput" type="file" aria-label="写真または動画を撮影する"/></label><p class="captureHelp">ボタン全体をタップするとカメラが開きます。</p></div></section>
 <section class="screen" id="s5"><button class="back" onclick="go(4)">← 撮影へ</button><h1>自動解析</h1><div class="card"><div class="imageStage hidden" id="imageWrap"><canvas id="imageCanvas"></canvas></div><div class="videoStage hidden" id="videoWrap"><video controls="" id="motionVideo" muted="" playsinline=""></video><canvas id="videoCanvas"></canvas></div><div class="status" id="status">撮影データを読み込んでください。</div><button class="btn hidden" id="startBtn">先頭から解析する</button><div class="hidden" id="analysisBox"><h2>今回の良いところと特徴</h2><div id="analysisFeatures"></div></div><button class="btn hidden" id="resultBtn" onclick="showResult()">結果を見る</button><button class="btn secondary" onclick="retakeCapture()">撮り直す</button></div></section>
-<section class="screen" id="s6"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span class="pill" id="quality"></span><div class="imageStage hidden" id="resultVisualWrap"><canvas id="resultVisualCanvas"></canvas></div><div class="hidden" id="postureScoreBox"></div><div id="resultFeatures"></div><div class="resultBox" id="interpretation"></div><p class="small" id="resultReferenceNote">今回の結果は、撮影時の身体の位置や動きの特徴を示す参考情報であり、撮影条件によって変わります。</p><div class="qrBox hidden" id="resultQrBox"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div class="qrCanvas" id="resultQr"></div></div><div class="insoleGuide"><h2>オーダーメイドインソールのご案内</h2><p>作製の流れや料金などをご覧いただけます。</p><a class="insoleGuideLink" href="https://towa-hikari.jp/fitness/insole/" target="_blank" rel="noopener noreferrer">詳しい案内を見る</a></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
+<section class="screen" id="s6"><button class="back" onclick="go(2)">← メニューへ</button><h1>今回の身体チェック</h1><div class="card"><h2 id="resultTitle"></h2><span class="pill" id="quality"></span><div class="imageStage hidden" id="resultVisualWrap"><canvas id="resultVisualCanvas"></canvas></div><div class="hidden" id="postureScoreBox"></div><div id="resultFeatures"></div><div class="resultBox" id="interpretation"></div><p class="small" id="resultReferenceNote">今回の結果は、撮影時の身体の位置や動きの特徴を示す参考情報であり、撮影条件によって変わります。</p><div class="qrBox hidden" id="resultQrBox"><h2>スマートフォンで結果を見る</h2><p class="small">QRコードには文章結果だけが含まれ、撮影画像・動画は含まれません。</p><div class="qrCanvas" id="resultQr"></div></div><button class="btn secondary" onclick="go(2)">別の項目を撮影する</button><button class="btn danger" onclick="location.reload()">終了して消去する</button></div></section>
 <section class="screen" id="s7">
 <button class="back" onclick="go(2)">← 項目選択へ</button>
 <h1>足の測定・靴の提案</h1>
@@ -117,7 +117,7 @@ const configs={
  throw:{label:"投球フォーム",planes:["前額面"],kind:"video",desc:"肩・肘・体幹の特徴"},
  golf:{label:"ゴルフスイング",planes:["前額面"],kind:"video",desc:"頭部・体幹・回旋"}
 };
-let item="",plane="",features=[],qualityScore=0,postureScore=null,postureClassification=null,sportResult=null,landmarker=null,mode="",objectURL="",samples=[],controller=null,lastVideoTimestamp=0,analysisRunId=0,modelPromise=null,lastVideoLandmarks=null;
+let item="",plane="",features=[],qualityScore=0,postureScore=null,postureClassification=null,lastStillLandmarks=null,sportResult=null,landmarker=null,mode="",objectURL="",samples=[],controller=null,lastVideoTimestamp=0,analysisRunId=0,modelPromise=null,lastVideoLandmarks=null;
 window.go=n=>{document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('s'+n).classList.add('active');scrollTo(0,0)};
 $('consent').addEventListener('change',()=>{$('consentBtn').disabled=!$('consent').checked});
 const categoryGroups=[['【計測】足の測定・靴の提案','cat-measure',['foot']],['【姿勢】座位・立位','cat-posture',['seated','standing']],['【動作】立ち上がり・歩行・階段昇降','cat-motion',['standup','gait','stairs']],['【スポーツ】スクワット・投球動作・ゴルフ','cat-sports',['squat','throw','golf']]];categoryGroups.forEach(([title,cls,keys])=>{const section=document.createElement('div');section.className='categorySection';section.innerHTML=`<div class="categoryHead ${cls}">${title}</div><div class="categoryGrid"></div>`;const grid=section.querySelector('.categoryGrid');keys.forEach(key=>{const c=configs[key];const b=document.createElement('button');b.className='menuBtn';b.innerHTML=`${c.label}<span>${c.desc}</span>`;b.addEventListener('click',()=>{if(key==='foot'){resetFootScreen();go(7)}else selectItem(key)});grid.appendChild(b)});$('menu').appendChild(section)});const voiceSection=document.createElement('div');voiceSection.className='categorySection';voiceSection.innerHTML='<div class="categoryHead cat-voice">【音声チェック】子ども・シニア</div><div class="categoryGrid"><button class="menuBtn" data-voice-mode="child">子ども<span>ことばを選んで録音</span></button><button class="menuBtn" data-voice-mode="senior">シニア<span>短い文章を音読して録音</span></button></div>';voiceSection.querySelectorAll('[data-voice-mode]').forEach(b=>b.addEventListener('click',()=>{go(9);window.setVoiceMode(b.dataset.voiceMode)}));$('menu').appendChild(voiceSection);
@@ -171,7 +171,7 @@ function resetCaptureAnalysis(){
  if(controller){controller.dispose();controller=null}
  const v=$('motionVideo');try{v.pause()}catch(e){}v.removeAttribute('src');v.load();
  if(objectURL){URL.revokeObjectURL(objectURL);objectURL=''}
- samples=[];features=[];qualityScore=0;postureScore=null;postureClassification=null;sportResult=null;lastVideoLandmarks=null;const rv=$('resultVisualCanvas');if(rv)rv.getContext('2d').clearRect(0,0,rv.width,rv.height);$('resultVisualWrap').classList.add('hidden');
+ samples=[];features=[];qualityScore=0;postureScore=null;postureClassification=null;lastStillLandmarks=null;sportResult=null;lastVideoLandmarks=null;const rv=$('resultVisualCanvas');if(rv)rv.getContext('2d').clearRect(0,0,rv.width,rv.height);$('resultVisualWrap').classList.add('hidden');
  $('status').classList.remove('hidden');$('status').textContent='撮影データを読み込んでください。';
  $('analysisBox').classList.add('hidden');$('analysisFeatures').innerHTML='';$('resultBtn').classList.add('hidden');$('startBtn').classList.add('hidden');
  $('resultQrBox').classList.add('hidden');$('resultQr').innerHTML='';$('resultFeatures').innerHTML='';$('postureScoreBox').innerHTML='';
@@ -200,7 +200,7 @@ async function analyzeImage(img){
   const r=await detect();
   if(runId!==analysisRunId||!r)return;
   if(!r.landmarks?.length)throw Error('人物を検出できませんでした。全身が画面に入っているか確認してください');
-  const lm=r.landmarks[0],c=$('imageCanvas'),ctx=c.getContext('2d'),scale=Math.min(1,1200/img.naturalWidth||img.width);
+  const lm=r.landmarks[0];lastStillLandmarks=lm;const c=$('imageCanvas'),ctx=c.getContext('2d'),scale=Math.min(1,1200/img.naturalWidth||img.width);
   c.width=Math.round((img.naturalWidth||img.width)*scale);c.height=Math.round((img.naturalHeight||img.height)*scale);
   ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);draw(ctx,c,lm);
   qualityScore=visibility(lm);features=staticFeatures(lm);
@@ -583,15 +583,28 @@ function renderLandmarkVisualForResult(){
  try{if(configs[item]?.kind==='image'){const src=$('imageCanvas');if(!src.width||!src.height)throw Error('empty image');out.width=src.width;out.height=src.height;oc.clearRect(0,0,out.width,out.height);oc.drawImage(src,0,0);wrap.classList.remove('hidden');return}
  if(configs[item]?.kind==='video'){const v=$('motionVideo'),overlay=$('videoCanvas'),w=v.videoWidth||overlay.width,h=v.videoHeight||overlay.height;if(!w||!h)throw Error('empty video');out.width=w;out.height=h;oc.clearRect(0,0,w,h);try{oc.drawImage(v,0,0,w,h)}catch(e){}if(lastVideoLandmarks)draw(oc,out,lastVideoLandmarks);else if(overlay.width)oc.drawImage(overlay,0,0,w,h);wrap.classList.remove('hidden');return}wrap.classList.add('hidden')}catch(e){console.error('Result landmark visual failed',e);wrap.classList.add('hidden')}
 }
+function renderStandingImmediateResult(){
+ const target=$('analysisFeatures'),lm=lastStillLandmarks;if(!target)return;
+ let classification='';
+ if(plane==='矢状面'){
+  if(!postureClassification&&lm){try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing classification failed',e)}}
+  classification=postureClassificationHtml(postureClassification)||'<div class="status">姿勢分類を表示できませんでした。</div>';
+ }else classification='<div class="resultBox"><h2>今回の姿勢分類</h2><p>姿勢タイプ分類は立位の矢状面撮影で表示します。前額面では全身の左右差を表示します。</p></div>';
+ const detail=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
+ const detailHtml=(detail&&detail.length?detail:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ const score=postureScore?scoreHtml(postureScore):'';
+ target.innerHTML=`${classification}${score}<div class="feedbackSection"><h3>撮影後の姿勢フィードバック</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${nextActionText()}</div>`;
+}
+
 function finishAnalysis(){
  const status=$('status'),box=$('analysisBox'),btn=$('resultBtn');
  if(status){status.classList.add('hidden');status.innerHTML=''}
- try{renderPositiveFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
+ try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
  if(box)box.classList.remove('hidden');
  if(btn){btn.classList.remove('hidden');btn.disabled=false}
  if(box)box.scrollIntoView({behavior:'smooth',block:'start'});
  // ランドマーク解析完了後は、項目を問わず結果画面へ進む。
- setTimeout(showResult,250);
+ if(item!=='standing')setTimeout(showResult,250);
 }
 function normalizeResultScore(x){
  if(!x)return null;
