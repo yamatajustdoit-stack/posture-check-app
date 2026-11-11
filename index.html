@@ -505,8 +505,9 @@ function openSharedResult(){
    $('sharedScore').innerHTML=scoreHtml(d.s||d.score)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
    $('sharedFeatures').innerHTML=(d.f||d.features||[]).slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
-  $('sharedNote').textContent=(postureShared||footShared)?'':'今回確認できた結果です。';
-  $('sharedNote').classList.toggle('hidden',postureShared||footShared);
+  const hideSharedNote=postureShared||footShared||sharedItem==='gait';
+  $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
+  $('sharedNote').classList.toggle('hidden',hideSharedNote);
   $('sharedDisclaimer').classList.toggle('hidden',postureShared||footShared);
   go(8);return true;
  }catch(e){return false}
