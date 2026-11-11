@@ -445,7 +445,7 @@ function sportResultHtml(r){
  const label=r.score>=85?'基本動作に近い流れです':r.score>=70?'基本動作におおむね近い流れです':'今回、特徴が見られた動きがあります';
  const meaningful=(r.feature||'').includes('確認できました')&&!(r.feature||'').includes('違い')?'今回の映像では、大きく目立つ違いは確認されませんでした。':r.feature;
  const action=r.action||sportAction(r.kind||item,r);
- return`<div class="sportScore"><h3>基本動作との一致度</h3><div class="sportScoreNumber">${r.score}<span>％</span></div><p>${label}</p></div><div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>動作の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
+ return`<div class="sportScore"><h3>基本動作との一致度</h3><div class="sportScoreNumber">${r.score}<span>％</span></div><p>${label}</p></div><div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>今回の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
 }
 function encodeResult(data){
  const json=JSON.stringify(data);
@@ -553,6 +553,71 @@ function nextActionText(){
  };
  return map[item]||'同じ撮影条件でもう一度行い、違いを見比べてみましょう。';
 }
+function pdfBasedFeedbackHtml(kind=item,view=plane){
+ const note='<p class="small">写真・動画から確認できた位置関係と動きに基づく参考情報です。痛みや疾患を判定するものではありません。同じ条件での再撮影や左右差・過去結果との比較に活用してください。</p>';
+ let title=kind==='standing'||kind==='seated'?'姿勢フィードバック':'動作フィードバック';
+ let points=[];
+ if(kind==='standing'&&view==='前額面')points=[
+  '頭部、肩、骨盤、膝の左右の高さと、身体の縦のラインを順に確認します。',
+  '左右差が見られた部位だけでなく、そろっている部位も良い点として確認しましょう。',
+  '足幅、立つ位置、カメラの傾きをそろえて再撮影すると変化を比べやすくなります。'
+ ];
+ else if(kind==='standing'&&view==='矢状面')points=[
+  '足首を基準に、耳、肩、股関節、膝の前後位置を上から順に確認します。',
+  '姿勢タイプ候補は全身の位置関係をまとめた参考表示です。各部位の特徴と一緒に確認してください。',
+  '肩の力を抜いた普段どおりの立ち方で再撮影し、位置関係の変化を比べましょう。'
+ ];
+ else if(kind==='seated')points=[
+  '頭部と肩、骨盤の左右差、上半身の前後位置、足底の接地を確認します。',
+  '椅子の中央に座り、左右のお尻と足裏で均等に支えられているか見比べましょう。',
+  '椅子やカメラの位置をそろえて再撮影すると、座り方の変化を確認しやすくなります。'
+ ];
+ else if(kind==='gait')points=[
+  '歩行は「前へ進む動き」「上下動の安定性」「左右差」の3つに分けて確認します。',
+  '歩幅やテンポだけでなく、頭・体幹の上下動と、左右の足の上がり方も見比べましょう。',
+  '同じ靴、距離、歩く速さ、撮影方向で繰り返すと変化を比較しやすくなります。'
+ ];
+ else if(kind==='stairs')points=[
+  '段差へ足を運ぶ場面、身体を持ち上げる場面、次の一歩へ移る場面に分けて確認します。',
+  '左右の膝の曲がり方、体幹の傾き、足の上がり方の違いを見比べましょう。',
+  '安全を優先し、同じ段差と撮影方向で比較してください。'
+ ];
+ else if(kind==='squat')points=[
+  '開始姿勢、最も深くしゃがんだ場面、立ち上がる場面に分けて確認します。',
+  '膝・股関節の曲がり方、体幹の傾き、左右差を見比べましょう。',
+  '深さを競わず、同じ足幅と速さで繰り返すと変化を比較しやすくなります。'
+ ];
+ else if(kind==='standup')points=[
+  '身体を前へ移す場面、お尻が座面から離れる場面、立位が安定する場面を確認します。',
+  '体幹の前傾、左右の膝の使い方、立った後の安定性を見比べましょう。',
+  '椅子の高さと足の位置をそろえて比較してください。'
+ ];
+ else if(kind==='single')points=[
+  '片脚で支えた直後、保持中、足を戻す場面を確認します。',
+  '頭・体幹・骨盤の傾きと、支えている膝の位置を見比べましょう。',
+  '転倒しない環境を確保し、保持時間よりも安全と再現性を優先してください。'
+ ];
+ else if(kind==='throw')points=[
+  '踏み出し、前足接地、ボールを放す場面、投げ終わりの順に確認します。',
+  '体幹の回転、肩と肘の位置、左右の足への体重移動を場面ごとに見比べましょう。',
+  '同じ方向・距離・速度で複数回撮影し、共通して現れる特徴を確認してください。'
+ ];
+ else if(kind==='golf')points=[
+  '構え、振り上げ、切り返し、ボール付近を通る場面、振り終わりの順に確認します。',
+  '頭部の位置、体幹と骨盤の回転順序、左右の足への体重移動を見比べましょう。',
+  '同じクラブ、構え、撮影位置で複数回比較してください。'
+ ];
+ else points=[
+  '動作を開始・中間・終了の場面に分け、身体各部の位置関係を確認します。',
+  '左右差、動く順序、安定している場面を見比べましょう。',
+  '同じ撮影条件で繰り返し、過去の結果との変化に活用してください。'
+ ];
+ return `<div class="feedbackSection pdfBasedFeedback"><h3>${title}の見方</h3>${points.map(x=>`<div class="feature goodFeature">・${x}</div>`).join('')}${note}</div>`;
+}
+function appendPdfBasedFeedback(targetId){
+ const target=$(targetId);if(!target||target.querySelector('.pdfBasedFeedback'))return;
+ target.insertAdjacentHTML('beforeend',pdfBasedFeedbackHtml());
+}
 function renderPositiveFeedback(targetId){
  const postureItem=item==='standing'||item==='seated';
  const focus=focusFeatures();
@@ -573,10 +638,10 @@ function renderPositiveFeedback(targetId){
   const ev=movementEvaluation(item);
   if(!ev.score){$(targetId).innerHTML=`<div class="status"><b>解析結果を作成できませんでした。</b><br>${ev.action}</div>`;return}
   const label=item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度';
-  $(targetId).innerHTML=`${scoreHtml({score:ev.score,label})}<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;return;
+  $(targetId).innerHTML=`${scoreHtml({score:ev.score,label})}<div class="feedbackSection"><h3>今回の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;return;
  }
  const ev=movementEvaluation(item);
- $(targetId).innerHTML=`<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
+ $(targetId).innerHTML=`<div class="feedbackSection"><h3>今回の特徴</h3><div class="feature focusFeature">・${ev.feature}</div></div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
 }
 function renderLandmarkVisualForResult(){
  const wrap=$('resultVisualWrap'),out=$('resultVisualCanvas');if(!wrap||!out)return;const oc=out.getContext('2d');
@@ -599,7 +664,7 @@ function renderStandingImmediateResult(){
 function finishAnalysis(){
  const status=$('status'),box=$('analysisBox'),btn=$('resultBtn');
  if(status){status.classList.add('hidden');status.innerHTML=''}
- try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
+ try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures');appendPdfBasedFeedback('analysisFeatures')}catch(e){console.error('Analysis feedback render failed',e)}
  if(box)box.classList.remove('hidden');
  if(btn){btn.classList.remove('hidden');btn.disabled=false}
  if(box)box.scrollIntoView({behavior:'smooth',block:'start'});
@@ -628,30 +693,21 @@ function showResult(){
   $('postureScoreBox').innerHTML=scoreHtml(showScore);
   $('postureScoreBox').classList.toggle('hidden',!showScore);
   try{
-   if(item==='standing'||item==='seated'){
+   if(item==='standing'){
     const lm=lastStillLandmarks;
-    let candidateHtml='';
-    if(item==='standing'&&plane==='矢状面'){
-     if(!postureClassification&&lm){
-      try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing result classification failed',e)}
-     }
-     candidateHtml=postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>';
+    if(plane==='矢状面'&&!postureClassification&&lm){
+     try{postureClassification=classifyStandingPosture(lm)}catch(e){console.error('Standing result classification failed',e)}
     }
-    const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,item,plane):[];
-    let featureItems=details;
-    if((!featureItems||!featureItems.length)&&item==='seated'){
-     const ev=movementEvaluation('seated');
-     if(ev&&ev.feature)featureItems=[ev.feature];
-    }
-    const detailHtml=(featureItems&&featureItems.length?featureItems:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+    const candidateHtml=plane==='矢状面'
+     ?(postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>')
+     :'<div class="resultBox"><h2>今回の姿勢の候補</h2><p>前額面では姿勢タイプ分類を行わず、全身の左右差を確認します。</p></div>';
+    const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
+    const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
     $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
    }else{
     renderPositiveFeedback('resultFeatures');
-    if(!$('resultFeatures').innerHTML.trim()){
-     const ev=movementEvaluation(item);
-     $('resultFeatures').innerHTML=`<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${ev.feature||'今回の動作を確認しました。'}</div></div>`;
-    }
    }
+   appendPdfBasedFeedback('resultFeatures');
   }catch(e){console.error('Result feedback render failed',e);$('resultFeatures').innerHTML='<div class="status">ランドマークは検出できました。結果の詳細表示を再読み込みしています。</div>'}
   const txt=item==='gait'?'歩き方には一人ひとりの特徴があります。今回確認できた動きを、靴や普段の歩き方を見直すきっかけとして活用してください。':item==='throw'?'投球動作をフェーズに分け、最も特徴が見られた場面を表示しています。':item==='golf'?'ゴルフスイングをフェーズに分け、最も特徴が見られた場面を表示しています。':item==='squat'?'今回の映像から、しゃがんで立つときの身体の使い方を表示しています。良いところを活かし、両足で床を感じながら行ってみてください。':'今回確認できた身体の位置と動きを表示しています。';
   $('interpretation').textContent=txt;
