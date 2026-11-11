@@ -562,7 +562,7 @@ function renderGaitAnalysisResult(targetId){
  if(typeof gaitFeatureDetails==='function')detailList=gaitFeatureDetails();
  if(!Array.isArray(detailList)||!detailList.length)detailList=[ev.feature||'今回の歩行から、身体の中心移動と左右の足運びを確認しました。'];
  const detailHtml=detailList.filter(Boolean).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`${scoreHtml(scoreData)}<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action||'前方を見ながら、左右の足を同じように運ぶことを意識してみましょう。'}</div>`;
+ target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
 }
 function renderPositiveFeedback(targetId){
  const postureItem=item==='standing'||item==='seated';
