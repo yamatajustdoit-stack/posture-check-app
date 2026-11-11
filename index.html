@@ -351,6 +351,37 @@ function sportResultHtml(r){
  const action=r.action||sportAction(r.kind||item,r);
  return`<div class="sportScore"><h3>基本動作との一致度</h3><div class="sportScoreNumber">${r.score}<span>％</span></div><p>${label}</p></div><div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>今回の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
 }
+function encodeResult(data){
+ const json=JSON.stringify(data);
+ const bytes=new TextEncoder().encode(json);
+ let binary='';
+ bytes.forEach(b=>binary+=String.fromCharCode(b));
+ return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeResult(value){
+ const base64=value.replace(/-/g,'+').replace(/_/g,'/');
+ const padded=base64+'='.repeat((4-base64.length%4)%4);
+ const binary=atob(padded);
+ const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+ return JSON.parse(new TextDecoder().decode(bytes));
+}
+function renderQr(elementId,data){
+ const el=$(elementId);
+ if(!el)return;
+ el.innerHTML='';
+ if(typeof QRCode==='undefined'){
+  el.innerHTML='<p class="small">QRコード生成機能を読み込めませんでした。通信環境を確認して再読み込みしてください。</p>';
+  return;
+ }
+ const base=location.href.split('#')[0];
+ const url=base+'#result='+encodeResult(data);
+ try{
+  new QRCode(el,{text:url,width:220,height:220,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+ }catch(error){
+  console.error('QR code generation failed',error);
+  el.innerHTML='<p class="small">QRコードを生成できませんでした。もう一度結果を表示してください。</p>';
+ }
+}
 function shareData(){
  const ev=['gait','stairs','squat','seated'].includes(item)?movementEvaluation(item):null;
  const resultScore=postureScore||(sportResult?{score:sportResult.score,label:'基本動作との一致度'}:ev?.score?{score:ev.score,label:item==='seated'?'座り姿勢の整い度':item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
