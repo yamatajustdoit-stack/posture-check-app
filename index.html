@@ -460,6 +460,25 @@ function sportAction(kind,r){
  if(f.includes('振り終')||f.includes('フィニッシュ'))return '振り終わった姿勢で、足を動かさず2秒止まってみましょう。';
  return '振り終わった姿勢で、足を動かさず2秒止まってみましょう。';
 }
+function sportMotionFeatures(kind,r){
+ const list=[];
+ const push=x=>{if(x&&!list.includes(x))list.push(x)};
+ push(r?.feature);
+ push(r?.comparison);
+ (features||[]).forEach(push);
+ const fallback=kind==='throw'?
+  ['投球中の頭部と体幹の移動を確認しました。','左右の肩と骨盤の位置変化を確認しました。','肘と手首を使う動きの流れを確認しました。']:
+  ['スイング中の頭部と体幹の移動を確認しました。','左右の肩と骨盤の位置変化を確認しました。','構えから振り終わりまでの身体の流れを確認しました。'];
+ fallback.forEach(push);
+ return list.slice(0,3);
+}
+function renderSportMotionResult(targetId){
+ const target=$(targetId);if(!target)return;
+ if(!sportResult){target.innerHTML='<div class="status">動きを十分に確認できませんでした。頭から足先まで画面に入れ、動作全体をもう一度撮影してください。</div>';return}
+ const r={...sportResult,kind:item};
+ const detailHtml=sportMotionFeatures(item,r).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ target.innerHTML=`${sportResultHtml(r)}<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
+}
 function sportResultHtml(r){
  if(!r)return'';
  const label=r.score>=85?'基本動作に近い流れです':r.score>=70?'基本動作におおむね近い流れです':'今回、特徴が見られた動きがあります';
@@ -617,7 +636,7 @@ function renderPositiveFeedback(targetId){
   let featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
   $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>`;return;
  }
- if(item==='throw'||item==='golf'){$(targetId).innerHTML=sportResult?sportResultHtml({...sportResult,kind:item}):'<div class="status">動きを十分に確認できませんでした。頭から足先まで画面に入れ、動作全体をもう一度撮影してください。</div>';return}
+ if(item==='throw'||item==='golf'){renderSportMotionResult(targetId);return}
  if(item==='gait'){renderGaitAnalysisResult(targetId);return}
  if(['gait','stairs','squat'].includes(item)){
   const ev=movementEvaluation(item);
