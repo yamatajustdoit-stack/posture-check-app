@@ -267,6 +267,26 @@ function postureDetailedFeatures(lm,type,view){
  }
  return out.slice(0,3);
 }
+function seatedDetailedFeatures(lm,view){
+ const out=[];
+ if(view==='前額面'){
+  const shoulderX=(lm[11].x+lm[12].x)/2,hipX=(lm[23].x+lm[24].x)/2;
+  const headShift=lm[0].x-shoulderX,shoulderDiff=lm[11].y-lm[12].y,trunkShift=shoulderX-hipX,hipDiff=lm[23].y-lm[24].y,kneeDiff=lm[25].y-lm[26].y;
+  out.push(Math.abs(headShift)>.018?`頭は身体の中心より画像上で${headShift>0?'右':'左'}側に位置しています。`:'頭は身体の中心付近に位置しています。');
+  out.push(Math.abs(shoulderDiff)>.018?`画像上で${shoulderDiff>0?'左':'右'}肩が低く、肩の高さに左右差があります。`:'左右の肩の高さは、おおむね揃っています。');
+  out.push(Math.abs(trunkShift)>.024?`上半身の中心が骨盤の中心より画像上で${trunkShift>0?'右':'左'}側に位置しています。`:'上半身と骨盤の中心は、おおむね揃っています。');
+  out.push(Math.abs(hipDiff)>.018?`画像上で${hipDiff>0?'左':'右'}の骨盤付近が低く、骨盤の高さに左右差があります。`:'骨盤付近の高さは、おおむね揃っています。');
+  out.push(Math.abs(kneeDiff)>.025?`画像上で${kneeDiff>0?'左':'右'}膝が低く、左右の膝の位置に差があります。`:'左右の膝の位置は、おおむね揃っています。');
+ }else{
+  const left=(lm[7].visibility||0)+(lm[11].visibility||0)>=(lm[8].visibility||0)+(lm[12].visibility||0),ids=left?[7,11,23,25,27]:[8,12,24,26,28];
+  const ear=lm[ids[0]],sh=lm[ids[1]],hip=lm[ids[2]],knee=lm[ids[3]],ankle=lm[ids[4]],h=Math.max(.2,Math.abs(ankle.y-ear.y)),facing=(lm[0].x-ear.x)>=0?1:-1;
+  const head=(ear.x-sh.x)*facing/h,trunk=(sh.x-hip.x)*facing/h,kneePos=(knee.x-hip.x)*facing/h;
+  out.push(Math.abs(head)>.04?`頭は肩より${head>0?'前':'後ろ'}に位置しています。`:'頭と肩の前後位置は、おおむね揃っています。');
+  out.push(Math.abs(trunk)>.04?`肩は骨盤付近より${trunk>0?'前':'後ろ'}に位置しています。`:'肩と骨盤付近の前後位置は、おおむね揃っています。');
+  out.push(Math.abs(kneePos)>.09?`膝は骨盤付近より${kneePos>0?'前':'後ろ'}に位置しています。`:'骨盤付近と膝の前後位置は、おおむね整っています。');
+ }
+ return out;
+}
 function staticFeatures(lm){
  if(item==='standing'||item==='seated')return postureDetailedFeatures(lm,item,plane);
  return['身体の主要な位置関係を確認できました'];
@@ -479,10 +499,11 @@ function renderQr(elementId,data){
  }
 }
 function shareData(){
- const ev=['gait','stairs','squat','seated'].includes(item)?movementEvaluation(item):null;
+ const ev=['gait','stairs','squat'].includes(item)?movementEvaluation(item):null;
+ const seatedShareFeatures=item==='seated'&&lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):null;
  const resultScore=postureScore||(sportResult?{total:sportResult.score,label:'基本動作との一致度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='seated'?'座り姿勢の整い度':item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
- return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:ev?[ev.feature,ev.action]:features.slice(0,(item==='standing'||item==='seated')?3:2),r:sf,a:ev?.action||''};
+ return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:seatedShareFeatures||(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)),r:sf,a:ev?.action||''};
 }
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
 function openSharedResult(){
@@ -572,7 +593,7 @@ function renderPositiveFeedback(targetId){
   const heading=item==='standing'?'今回の立ち姿勢の特徴':'今回の座り姿勢の特徴';
   let featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
   if(item==='seated'){
-   const detail=(lastStillLandmarks&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lastStillLandmarks,'seated',plane):focus;
+   const detail=(lastStillLandmarks&&typeof seatedDetailedFeatures==='function')?seatedDetailedFeatures(lastStillLandmarks,plane):focus;
    featureHtml=(detail&&detail.length?detail:['撮影画像から、頭・肩・骨盤・膝の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>`;return;
