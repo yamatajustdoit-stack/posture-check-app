@@ -649,12 +649,12 @@ function renderStandingImmediateResult(){
 function finishAnalysis(){
  const status=$('status'),box=$('analysisBox'),btn=$('resultBtn');
  if(status){status.classList.add('hidden');status.innerHTML=''}
- try{if(item==='standing')renderStandingImmediateResult();else if(item==='seated')renderSeatedPostureResult('analysisFeatures');else renderPositiveFeedback('analysisFeatures');const analysisHeading=box?.querySelector('h2');if(analysisHeading&&(item==='standing'||item==='seated'))analysisHeading.textContent='解析結果'}catch(e){console.error('Analysis feedback render failed',e)}
+ try{if(item==='standing')renderStandingImmediateResult();else if(item==='seated')renderSeatedPostureResult('analysisFeatures');else renderPositiveFeedback('analysisFeatures');const analysisHeading=box?.querySelector('h2');if(analysisHeading&&(item==='standing'||item==='seated'||item==='gait'))analysisHeading.textContent='解析結果'}catch(e){console.error('Analysis feedback render failed',e)}
  if(box)box.classList.remove('hidden');
  if(btn){btn.classList.remove('hidden');btn.disabled=false}
  if(box)box.scrollIntoView({behavior:'smooth',block:'start'});
  // ランドマーク解析完了後は、項目を問わず結果画面へ進む。
- if(item!=='standing'&&item!=='seated')setTimeout(showResult,250);
+ if(item!=='standing'&&item!=='seated'&&item!=='gait')setTimeout(showResult,250);
 }
 function normalizeResultScore(x){
  if(!x)return null;
