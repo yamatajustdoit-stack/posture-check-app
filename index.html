@@ -525,7 +525,7 @@ function openSharedResult(){
   }else{
    const sharedScoreData=d.s||d.score;if(sharedScoreData&&Number.isFinite(sharedScoreData.score)&&!Number.isFinite(sharedScoreData.total))sharedScoreData.total=sharedScoreData.score;$('sharedScore').innerHTML=scoreHtml(sharedScoreData)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
    const sharedFeatureList=(d.f||d.features||[]);
-   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   const hideSharedNote=postureShared||footShared||sharedItem==='gait';
   $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
@@ -579,12 +579,12 @@ function nextActionText(){
 function renderGaitAnalysisResult(targetId){
  const target=$(targetId);if(!target)return;
  const ev=movementEvaluation('gait');
- const scoreData=Number.isFinite(ev.score)?{total:ev.score,label:'歩行の整い度'}:null;
+ 
  let detailList=[];
  if(typeof gaitFeatureDetails==='function')detailList=gaitFeatureDetails();
  if(!Array.isArray(detailList)||!detailList.length)detailList=[ev.feature||'今回の歩行から、身体の中心移動と左右の足運びを確認しました。'];
  const detailHtml=detailList.filter(Boolean).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`${scoreHtml(scoreData)}<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action||'前方を見ながら、左右の足を同じように運ぶことを意識してみましょう。'}</div>`;
+ target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action||'前方を見ながら、左右の足を同じように運ぶことを意識してみましょう。'}</div>`;
 }
 function renderSeatedPostureResult(targetId){
  const target=$(targetId);if(!target)return;
@@ -596,8 +596,9 @@ function renderSeatedPostureResult(targetId){
    ['頭と身体中心の位置を確認しました。','左右の肩の高さを確認しました。','上半身と骨盤中心の位置を確認しました。','骨盤付近の高さを確認しました。','左右の膝の位置を確認しました。']:
    ['頭と肩の前後位置を確認しました。','肩と骨盤付近の前後位置を確認しました。','骨盤付近と膝の前後位置を確認しました。'];
  }
- const featureHtml=detail.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`<div class="feedbackSection seatedFeatureSection"><h3>姿勢の特徴</h3>${featureHtml}</div>`;
+ const featureHtml=detail.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ const score=postureScore?scoreHtml(postureScore):'';
+ target.innerHTML=`${score}<div class="feedbackSection seatedFeatureSection"><h3>姿勢の特徴</h3>${featureHtml}</div>`;
 }
 function renderPositiveFeedback(targetId){
  if(item==='seated'){renderSeatedPostureResult(targetId);return}
@@ -633,7 +634,7 @@ function renderStandingImmediateResult(){
   classification=postureClassificationHtml(postureClassification)||'<div class="status">姿勢分類を表示できませんでした。</div>';
  }else classification='<div class="resultBox"><h2>今回の姿勢分類</h2><p>姿勢タイプ分類は立位の矢状面撮影で表示します。前額面では全身の左右差を表示します。</p></div>';
  const detail=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
- const detailHtml=(detail&&detail.length?detail:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ const detailHtml=(detail&&detail.length?detail:['撮影画像から全身の位置関係を確認しました。']).slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  const score=postureScore?scoreHtml(postureScore):'';
  target.innerHTML=`${score}${classification}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
 }
@@ -667,8 +668,8 @@ function showResult(){
    if(e&&Number.isFinite(e.score))showScore={total:e.score,label:item==='seated'?'座り姿勢の整い度':item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'};
   }
   showScore=normalizeResultScore(showScore);
-  $('postureScoreBox').innerHTML=scoreHtml(showScore);
-  $('postureScoreBox').classList.toggle('hidden',!showScore);
+  $('postureScoreBox').innerHTML=item==='seated'?'':scoreHtml(showScore);
+  $('postureScoreBox').classList.toggle('hidden',item==='seated'||!showScore);
   try{
    if(item==='standing'){
     const lm=lastStillLandmarks;
@@ -679,7 +680,7 @@ function showResult(){
      ?(postureClassificationHtml(postureClassification)||'<div class="resultBox"><h2>今回の姿勢タイプ候補</h2><p>姿勢タイプ候補を表示できませんでした。</p></div>')
      :'';
     const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
-    const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+    const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
     $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
    }else if(item==='seated'){
     renderSeatedPostureResult('resultFeatures');
