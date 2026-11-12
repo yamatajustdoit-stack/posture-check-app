@@ -217,12 +217,12 @@ async function analyzeImage(img){
 }
 function clampScore(v){return Math.max(0,Math.min(20,Math.round(v)))}
 function scoreGrade(v){return v>=90?'S':v>=80?'A':v>=70?'B':v>=60?'C':'D'}
-function calculatePostureScore(lm,type,view){let parts=[];if(view==='前額面'){const shoulder=Math.abs(lm[11].y-lm[12].y),hip=Math.abs(lm[23].y-lm[24].y),head=Math.abs(lm[0].x-(lm[11].x+lm[12].x)/2),trunk=Math.abs((lm[11].x+lm[12].x)/2-(lm[23].x+lm[24].x)/2),lower=Math.abs(lm[25].y-lm[26].y);parts=[['頭部中央',clampScore(20-head*220)],['肩の水平性',clampScore(20-shoulder*260)],['体幹中央',clampScore(20-trunk*220)],['骨盤の水平性',clampScore(20-hip*260)],[type==='seated'?'膝の水平性':'下肢の左右差',clampScore(20-lower*180)]]}else{const left=(lm[7].visibility||0)+(lm[11].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0),i=left?[7,11,23,25,27]:[8,12,24,26,28],ear=lm[i[0]],sh=lm[i[1]],hip=lm[i[2]],knee=lm[i[3]],ankle=lm[i[4]],h=Math.max(.2,Math.abs(ankle.y-ear.y)),head=Math.abs(ear.x-sh.x)/h,trunk=Math.abs(sh.x-hip.x)/h,kneeShift=Math.abs(knee.x-hip.x)/h,ankleShift=Math.abs(ankle.x-hip.x)/h;parts=[['頭部前後位置',clampScore(20-head*150)],['肩・胸郭位置',clampScore(20-trunk*130)],['骨盤・体幹位置',clampScore(20-(head+trunk)*55)],[type==='seated'?'股関節・膝位置':'膝の前後位置',clampScore(20-kneeShift*90)],[type==='seated'?'座位支持位置':'足部支持位置',clampScore(20-ankleShift*70)]]}const total=parts.reduce((a,p)=>a+p[1],0);return{label:type==='seated'?'座位バランススコア':'立位バランススコア',total,grade:scoreGrade(total),parts}}
+function calculatePostureScore(lm,type,view){let parts=[];if(view==='前額面'){const shoulder=Math.abs(lm[11].y-lm[12].y),hip=Math.abs(lm[23].y-lm[24].y),head=Math.abs(lm[0].x-(lm[11].x+lm[12].x)/2),trunk=Math.abs((lm[11].x+lm[12].x)/2-(lm[23].x+lm[24].x)/2),lower=Math.abs(lm[25].y-lm[26].y);parts=[['頭部中央',clampScore(20-head*220)],['肩の水平性',clampScore(20-shoulder*260)],['体幹中央',clampScore(20-trunk*220)],['骨盤の水平性',clampScore(20-hip*260)],[type==='seated'?'膝の水平性':'下肢の左右差',clampScore(20-lower*180)]]}else{const left=(lm[7].visibility||0)+(lm[11].visibility||0)>(lm[8].visibility||0)+(lm[12].visibility||0),i=left?[7,11,23,25,27]:[8,12,24,26,28],ear=lm[i[0]],sh=lm[i[1]],hip=lm[i[2]],knee=lm[i[3]],ankle=lm[i[4]],h=Math.max(.2,Math.abs(ankle.y-ear.y)),head=Math.abs(ear.x-sh.x)/h,trunk=Math.abs(sh.x-hip.x)/h,kneeShift=Math.abs(knee.x-hip.x)/h,ankleShift=Math.abs(ankle.x-hip.x)/h;parts=[['頭部前後位置',clampScore(20-head*150)],['肩・胸郭位置',clampScore(20-trunk*130)],['骨盤・体幹位置',clampScore(20-(head+trunk)*55)],[type==='seated'?'股関節・膝位置':'膝の前後位置',clampScore(20-kneeShift*90)],[type==='seated'?'座位支持位置':'足部支持位置',clampScore(20-ankleShift*70)]]}const total=parts.reduce((a,p)=>a+p[1],0);return{label:type==='seated'?'座り姿勢の整い度':'立位バランススコア',total,grade:scoreGrade(total),parts}}
 function scoreBand(v){return v>=85?{label:'全体として整っています',tone:'今回の良い状態を確認できました'}:v>=70?{label:'おおむね整っています',tone:'良いところを土台に、気になる点を確認しましょう'}:v>=55?{label:'いくつか注目ポイントがあります',tone:'できている部分も多くあります'}:{label:'撮影条件を整えて再確認しましょう',tone:'低い値は姿勢だけでなく撮影条件の影響も受けます'}}
 function scoreHtml(x){
  if(!x)return'';
- const band=scoreBand(x.total);
- return`<div class="scoreCard"><div class="scoreHeadline">${(x.label||'姿勢').replace('スコア','')}｜今回の整い度</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div><p class="small">「今回の整い度」と姿勢タイプは、写真上の身体の位置関係を数値化・分類した参考表示であり、撮影角度、距離、服装、明るさ、立ち方・座り方によって変わります。</p>`;
+ const band=scoreBand(x.total),scoreTitle=(x.label||'姿勢').includes('整い度')?(x.label||'姿勢'):`${(x.label||'姿勢').replace('スコア','')}｜今回の整い度`;
+ return`<div class="scoreCard"><div class="scoreHeadline">${scoreTitle}</div><div class="scoreValue">${x.total}<span style="font-size:20px">%</span></div><div class="scoreMessage">${band.label}</div><div class="scoreBarWrap"><div class="scoreBar" style="width:${Math.max(4,x.total)}%"></div></div></div><p class="small">「今回の整い度」と姿勢タイプは、写真上の身体の位置関係を数値化・分類した参考表示であり、撮影角度、距離、服装、明るさ、立ち方・座り方によって変わります。</p>`;
 }
 function postureDetailedFeatures(lm,type,view){
  const out=[];
@@ -524,7 +524,8 @@ function openSharedResult(){
    $('sharedFeatures').innerHTML=`<div class="resultBox"><h2>対象区分</h2><p>${categoryLabel}</p></div><div class="resultBox"><h2>提案サイズ</h2><p>${d.sz||''}cm</p></div><div class="resultBox"><h2>JISウイズ目安：${d.w||''}${d.wl?`（${d.wl}）`:''}</h2><p>ウイズは、親指と小指の付け根を一周した「足囲」の目安です。靴を選ぶときは「細め・標準・広め」の表示を参考にしてください。</p><p class="small">※靴の形は商品ごとに異なるため、最終的には試着して確認してください。</p></div><div class="resultBox"><h2>足の形状</h2><p><b>${typeLabel}</b></p><p>${toeExplanation(typeLabel)}</p></div><div class="resultBox"><h2>おすすめメーカー</h2>${brandNames.length?brandNames.map((x,i)=>`<p>${i+1}. ${x}</p>`).join(''):'<p>条件に合うメーカーを絞り込めませんでした。表示サイズだけで決めず、つま先の形、横幅、かかとの収まりを試着で確認してください。</p>'}</div>`;
   }else{
    const sharedScoreData=d.s||d.score;if(sharedScoreData&&Number.isFinite(sharedScoreData.score)&&!Number.isFinite(sharedScoreData.total))sharedScoreData.total=sharedScoreData.score;$('sharedScore').innerHTML=scoreHtml(sharedScoreData)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
-   $('sharedFeatures').innerHTML=(d.f||d.features||[]).slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+   const sharedFeatureList=(d.f||d.features||[]);
+   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   const hideSharedNote=postureShared||footShared||sharedItem==='gait';
   $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
@@ -590,7 +591,7 @@ function renderPositiveFeedback(targetId){
  const focus=focusFeatures();
  if(postureItem){
   const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
-  const heading=item==='standing'?'今回の立ち姿勢の特徴':'今回の座り姿勢の特徴';
+  const heading='姿勢の特徴';
   let featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
   if(item==='seated'){
    const detail=(lastStillLandmarks&&typeof seatedDetailedFeatures==='function')?seatedDetailedFeatures(lastStillLandmarks,plane):focus;
