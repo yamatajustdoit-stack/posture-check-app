@@ -326,7 +326,7 @@ async function setupVideoController(){
 function collectFrame(lm,t,target){
  if(visibility(lm)<45)return;
  const shoulderX=(lm[11].x+lm[12].x)/2,hipX=(lm[23].x+lm[24].x)/2;
- target.push({t,headX:lm[0].x,headY:lm[0].y,shoulderX,hipX,shoulderTilt:lm[11].y-lm[12].y,hipTilt:lm[23].y-lm[24].y,trunkX:shoulderX-hipX,kneeL:angle(lm[23],lm[25],lm[27]),kneeR:angle(lm[24],lm[26],lm[28]),elbowL:angle(lm[11],lm[13],lm[15]),elbowR:angle(lm[12],lm[14],lm[16]),wristLX:lm[15].x,wristRX:lm[16].x,wristLY:lm[15].y,wristRY:lm[16].y,ankleLX:lm[27].x,ankleRX:lm[28].x});
+ target.push({t,headX:lm[0].x,headY:lm[0].y,shoulderX,hipX,shoulderTilt:lm[11].y-lm[12].y,hipTilt:lm[23].y-lm[24].y,trunkX:shoulderX-hipX,kneeL:angle(lm[23],lm[25],lm[27]),kneeR:angle(lm[24],lm[26],lm[28]),elbowL:angle(lm[11],lm[13],lm[15]),elbowR:angle(lm[12],lm[14],lm[16]),wristLX:lm[15].x,wristRX:lm[16].x,wristLY:lm[15].y,wristRY:lm[16].y,ankleLX:lm[27].x,ankleRX:lm[28].x,ankleLY:lm[27].y,ankleRY:lm[28].y,kneeLX:lm[25].x,kneeRX:lm[26].x,hipWidth:Math.abs(lm[23].x-lm[24].x)});
 }
 function summarize(a){
  if(a.length<8)return['撮影条件を整えると、動きの特徴をさらに分かりやすく確認できます'];
@@ -530,7 +530,9 @@ function shareData(){
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
  const sportShareBase=(item==='throw'||item==='golf')?(sportResult?{...sportResult,kind:item}:{kind:item,score:sportFallbackScore,feature:(features||[]).find(Boolean)||(item==='throw'?'投球開始から投げ終わりまでの身体の動きを確認しました。':'構えから振り終わりまでの身体の動きを確認しました。'),comparison:'動画から頭部・体幹・肩・骨盤の動きを確認しました。'}):null;
  const sportShareFeatures=sportShareBase?sportMotionFeatures(item,sportShareBase):null;
- const sharedFeatures=seatedShareFeatures||sportShareFeatures||(item==='gait'?gaitShareFeatures:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
+ const gaitMetrics=item==='gait'?gaitResultMetrics():null;
+ const gaitSharedDetails=gaitMetrics?[...gaitShareFeatures,`立脚時間の左右差：${gaitMetrics.stance}`,`膝の位置（開き具合）：${gaitMetrics.knee}`,`体幹の傾きの左右差：${gaitMetrics.trunk}`,`足の上がり具合：${gaitMetrics.lift}`]:gaitShareFeatures;
+ const sharedFeatures=seatedShareFeatures||sportShareFeatures||(item==='gait'?gaitSharedDetails:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
  return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:sharedFeatures,r:(item==='throw'||item==='golf')?null:sf,a:item==='seated'?seatedAdvice:((item==='gait'||item==='throw'||item==='golf')?'':(ev?.action||''))};
 }
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
@@ -553,7 +555,7 @@ function openSharedResult(){
   }else{
    const sharedScoreData=d.s||d.score;if(sharedScoreData&&Number.isFinite(sharedScoreData.score)&&!Number.isFinite(sharedScoreData.total))sharedScoreData.total=sharedScoreData.score;$('sharedScore').innerHTML=scoreHtml(sharedScoreData)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
    const sharedFeatureList=(d.f||d.features||[]);
-   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:(sharedItem==='throw'||sharedItem==='golf')?`<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:(sharedItem==='throw'||sharedItem==='golf')?`<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedItem==='gait'?`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div><div class="feedbackSection gaitMetricSection"><h3>歩行の確認項目</h3>${sharedFeatureList.slice(3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   const hideSharedNote=postureShared||footShared||sharedItem==='gait';
   $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
@@ -604,6 +606,28 @@ function nextActionText(){
  };
  return map[item]||'同じ撮影条件でもう一度行い、違いを見比べてみましょう。';
 }
+function gaitResultMetrics(){
+ const a=(samples||[]).filter(x=>Number.isFinite(x.ankleLY)&&Number.isFinite(x.ankleRY));
+ const neutral={stance:'立脚時間の左右差は、今回の映像では十分に算出できませんでした。',knee:'左右の膝の位置は、今回の映像では十分に確認できませんでした。',trunk:'体幹の傾きの左右差は、今回の映像では十分に確認できませんでした。',lift:'足の上がり具合は、今回の映像では十分に確認できませんでした。'};
+ if(a.length<8)return neutral;
+ const avg=v=>v.length?v.reduce((x,y)=>x+y,0)/v.length:0,range=v=>v.length?Math.max(...v)-Math.min(...v):0;
+ let leftTime=0,rightTime=0;
+ for(let i=1;i<a.length;i++){
+  const dt=Math.max(0,Math.min(.2,(a[i].t-a[i-1].t)/1000));
+  const lv=Math.abs(a[i].ankleLY-a[i-1].ankleLY),rv=Math.abs(a[i].ankleRY-a[i-1].ankleRY);
+  if(lv<.012&&a[i].ankleLY>=a[i].ankleRY-.025)leftTime+=dt;
+  if(rv<.012&&a[i].ankleRY>=a[i].ankleLY-.025)rightTime+=dt;
+ }
+ const stanceTotal=leftTime+rightTime,stanceDiff=stanceTotal?Math.abs(leftTime-rightTime)/stanceTotal*100:0;
+ const stance=stanceTotal<.15?neutral.stance:stanceDiff<8?'立脚時間は左右でおおむね揃っています。':`立脚時間は${leftTime>rightTime?'左':'右'}が長く、左右差は約${Math.round(stanceDiff)}％です。`;
+ const kneeRatios=a.map(x=>Math.abs(x.kneeLX-x.kneeRX)/Math.max(.04,x.hipWidth||.04));
+ const kneeAvg=avg(kneeRatios),knee=kneeAvg<.75?'左右の膝は骨盤幅より内側に近い位置で運ばれています。':kneeAvg>1.35?'左右の膝は骨盤幅より外側へ開く位置で運ばれています。':'左右の膝は骨盤幅に近い位置で運ばれています。';
+ const trunkValues=a.map(x=>(x.shoulderTilt+x.hipTilt)/2),leftTilt=Math.abs(Math.min(0,...trunkValues)),rightTilt=Math.max(0,...trunkValues),tiltDiff=Math.abs(leftTilt-rightTilt);
+ const trunk=tiltDiff<.015?'体幹の傾きは左右でおおむね揃っています。':`体幹は画像上で${leftTilt>rightTilt?'左':'右'}側への傾きが大きく、左右差があります。`;
+ const leftLift=range(a.map(x=>x.ankleLY)),rightLift=range(a.map(x=>x.ankleRY)),liftAvg=(leftLift+rightLift)/2,liftDiff=Math.abs(leftLift-rightLift);
+ const lift=liftAvg<.025?'足の上下移動が小さく、足が上がりにくい歩き方が確認されました。':liftDiff>.025?`足の上がり具合は${leftLift>rightLift?'左':'右'}が大きく、左右差があります。`:'左右とも足が上がる動きを確認できました。';
+ return{stance,knee,trunk,lift};
+}
 function renderGaitAnalysisResult(targetId){
  const target=$(targetId);if(!target)return;
  let detailList=typeof gaitFeatureDetails==='function'?gaitFeatureDetails():[];
@@ -613,7 +637,9 @@ function renderGaitAnalysisResult(targetId){
  fallback.forEach(x=>{if(detailList.length<3&&!detailList.includes(x))detailList.push(x)});
  detailList=detailList.slice(0,3);
  const detailHtml=detailList.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
+ const metrics=gaitResultMetrics();
+ const metricHtml=[['立脚時間の左右差',metrics.stance],['膝の位置（開き具合）',metrics.knee],['体幹の傾きの左右差',metrics.trunk],['足の上がり具合',metrics.lift]].map(([label,text])=>`<div class="feature focusFeature"><b>${label}</b><br>${text}</div>`).join('');
+ target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="feedbackSection gaitMetricSection"><h3>歩行の確認項目</h3>${metricHtml}</div>`;
 }
 function renderSeatedPostureResult(targetId){
  const target=$(targetId);if(!target)return;
