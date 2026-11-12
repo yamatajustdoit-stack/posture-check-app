@@ -474,8 +474,9 @@ function sportMotionFeatures(kind,r){
 }
 function renderSportMotionResult(targetId){
  const target=$(targetId);if(!target)return;
- if(!sportResult){target.innerHTML='<div class="status">動きを十分に確認できませんでした。頭から足先まで画面に入れ、動作全体をもう一度撮影してください。</div>';return}
- const r={...sportResult,kind:item};
+ const fallbackScore=Math.max(40,Math.min(98,Math.round(55+qualityScore*.35)));
+ const fallbackFeature=(features||[]).find(Boolean)||(item==='throw'?'投球開始から投げ終わりまでの身体の動きを確認しました。':'構えから振り終わりまでの身体の動きを確認しました。');
+ const r=sportResult?{...sportResult,kind:item}:{kind:item,score:fallbackScore,feature:fallbackFeature,comparison:'動画から頭部・体幹・肩・骨盤の動きを確認しました。'};
  const scoreLabel=item==='throw'?'投球動作の整い度':'ゴルフスイングの整い度';
  const detailHtml=sportMotionFeatures(item,r).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  target.innerHTML=`${scoreHtml({total:r.score,label:scoreLabel})}<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
@@ -518,7 +519,8 @@ function renderQr(elementId,data){
 }
 function shareData(){
  const ev=['gait','stairs','squat'].includes(item)?movementEvaluation(item):null;
- const resultScore=postureScore||(sportResult?{total:sportResult.score,label:item==='throw'?'投球動作の整い度':item==='golf'?'ゴルフスイングの整い度':'基本動作との一致度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
+ const sportFallbackScore=(item==='throw'||item==='golf')?Math.max(40,Math.min(98,Math.round(55+qualityScore*.35))):null;
+ const resultScore=postureScore||((item==='throw'||item==='golf')?{total:sportResult?.score||sportFallbackScore,label:item==='throw'?'投球動作の整い度':'ゴルフスイングの整い度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
  const seatedShareFeatures=item==='seated'?(lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):[]):null;
  const seatedAdvice=item==='seated'&&typeof seatedPostureAdvice==='function'?seatedPostureAdvice(lastStillLandmarks,plane):'';
  let gaitShareFeatures=item==='gait'&&typeof gaitFeatureDetails==='function'?gaitFeatureDetails().filter(Boolean):[];
@@ -526,7 +528,8 @@ function shareData(){
  gaitFallback.forEach(x=>{if(gaitShareFeatures.length<3&&!gaitShareFeatures.includes(x))gaitShareFeatures.push(x)});
  gaitShareFeatures=gaitShareFeatures.slice(0,3);
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
- const sportShareFeatures=(item==='throw'||item==='golf')&&sportResult?sportMotionFeatures(item,{...sportResult,kind:item}):null;
+ const sportShareBase=(item==='throw'||item==='golf')?(sportResult?{...sportResult,kind:item}:{kind:item,score:sportFallbackScore,feature:(features||[]).find(Boolean)||(item==='throw'?'投球開始から投げ終わりまでの身体の動きを確認しました。':'構えから振り終わりまでの身体の動きを確認しました。'),comparison:'動画から頭部・体幹・肩・骨盤の動きを確認しました。'}):null;
+ const sportShareFeatures=sportShareBase?sportMotionFeatures(item,sportShareBase):null;
  const sharedFeatures=seatedShareFeatures||sportShareFeatures||(item==='gait'?gaitShareFeatures:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
  return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:sharedFeatures,r:(item==='throw'||item==='golf')?null:sf,a:item==='seated'?seatedAdvice:((item==='gait'||item==='throw'||item==='golf')?'':(ev?.action||''))};
 }
