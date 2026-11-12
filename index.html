@@ -478,14 +478,12 @@ function renderSportMotionResult(targetId){
  const r={...sportResult,kind:item};
  const scoreLabel=item==='throw'?'投球動作の整い度':'ゴルフスイングの整い度';
  const detailHtml=sportMotionFeatures(item,r).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`${scoreHtml({total:r.score,label:scoreLabel})}${sportResultHtml(r)}<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
+ target.innerHTML=`${scoreHtml({total:r.score,label:scoreLabel})}<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
 }
 function sportResultHtml(r){
  if(!r)return'';
- const label=r.score>=85?'基本動作に近い流れです':r.score>=70?'基本動作におおむね近い流れです':'今回、特徴が見られた動きがあります';
  const meaningful=(r.feature||'').includes('確認できました')&&!(r.feature||'').includes('違い')?'今回の映像では、大きく目立つ違いは確認されませんでした。':r.feature;
- const action=r.action||sportAction(r.kind||item,r);
- return`<div class="feedbackSection"><h3>最も特徴が見られた場面</h3><div class="sportPhase">${r.phase}</div></div><div class="feedbackSection"><h3>今回の特徴</h3><p>${meaningful}</p></div><div class="nextAction"><b>今回意識するポイント</b><br>${action}</div><p class="small">一致度は今回の映像内で基本動作と比較した参考値です。競技能力やけがの危険性を判定するものではありません。</p>`;
+ return`<div class="feedbackSection"><h3>動作の特徴</h3><div class="feature focusFeature">・${meaningful||'動作の流れを確認しました。'}</div></div>`;
 }
 function encodeResult(data){
  const json=JSON.stringify(data);
@@ -528,8 +526,9 @@ function shareData(){
  gaitFallback.forEach(x=>{if(gaitShareFeatures.length<3&&!gaitShareFeatures.includes(x))gaitShareFeatures.push(x)});
  gaitShareFeatures=gaitShareFeatures.slice(0,3);
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
- const sharedFeatures=seatedShareFeatures||(item==='gait'?gaitShareFeatures:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
- return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:sharedFeatures,r:sf,a:item==='seated'?seatedAdvice:(item==='gait'?'':(ev?.action||''))};
+ const sportShareFeatures=(item==='throw'||item==='golf')&&sportResult?sportMotionFeatures(item,{...sportResult,kind:item}):null;
+ const sharedFeatures=seatedShareFeatures||sportShareFeatures||(item==='gait'?gaitShareFeatures:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
+ return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:sharedFeatures,r:(item==='throw'||item==='golf')?null:sf,a:item==='seated'?seatedAdvice:((item==='gait'||item==='throw'||item==='golf')?'':(ev?.action||''))};
 }
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
 function openSharedResult(){
@@ -551,7 +550,7 @@ function openSharedResult(){
   }else{
    const sharedScoreData=d.s||d.score;if(sharedScoreData&&Number.isFinite(sharedScoreData.score)&&!Number.isFinite(sharedScoreData.total))sharedScoreData.total=sharedScoreData.score;$('sharedScore').innerHTML=scoreHtml(sharedScoreData)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
    const sharedFeatureList=(d.f||d.features||[]);
-   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:(sharedItem==='throw'||sharedItem==='golf')?`<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   const hideSharedNote=postureShared||footShared||sharedItem==='gait';
   $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
