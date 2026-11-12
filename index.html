@@ -500,7 +500,7 @@ function renderQr(elementId,data){
 }
 function shareData(){
  const ev=['gait','stairs','squat'].includes(item)?movementEvaluation(item):null;
- const seatedShareFeatures=item==='seated'&&lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):null;
+ const seatedShareFeatures=item==='seated'?(lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):(plane==='前額面'?['頭と身体中心の位置を確認しました。','左右の肩の高さを確認しました。','上半身と骨盤中心の位置を確認しました。','骨盤付近の高さを確認しました。','左右の膝の位置を確認しました。']:['頭と肩の前後位置を確認しました。','肩と骨盤付近の前後位置を確認しました。','骨盤付近と膝の前後位置を確認しました。'])):null;
  const resultScore=postureScore||(sportResult?{total:sportResult.score,label:'基本動作との一致度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='seated'?'座り姿勢の整い度':item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
  return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:seatedShareFeatures||(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)),r:sf,a:ev?.action||''};
@@ -586,17 +586,27 @@ function renderGaitAnalysisResult(targetId){
  const detailHtml=detailList.filter(Boolean).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  target.innerHTML=`${scoreHtml(scoreData)}<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action||'前方を見ながら、左右の足を同じように運ぶことを意識してみましょう。'}</div>`;
 }
+function renderSeatedPostureResult(targetId){
+ const target=$(targetId);if(!target)return;
+ const lm=lastStillLandmarks;
+ let detail=[];
+ try{if(lm)detail=seatedDetailedFeatures(lm,plane)}catch(e){console.error('Seated posture details failed',e)}
+ if(!detail.length){
+  detail=plane==='前額面'?
+   ['頭と身体中心の位置を確認しました。','左右の肩の高さを確認しました。','上半身と骨盤中心の位置を確認しました。','骨盤付近の高さを確認しました。','左右の膝の位置を確認しました。']:
+   ['頭と肩の前後位置を確認しました。','肩と骨盤付近の前後位置を確認しました。','骨盤付近と膝の前後位置を確認しました。'];
+ }
+ const featureHtml=detail.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ target.innerHTML=`<div class="feedbackSection seatedFeatureSection"><h3>姿勢の特徴</h3>${featureHtml}</div>`;
+}
 function renderPositiveFeedback(targetId){
- const postureItem=item==='standing'||item==='seated';
+ if(item==='seated'){renderSeatedPostureResult(targetId);return}
+ const postureItem=item==='standing';
  const focus=focusFeatures();
  if(postureItem){
   const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
   const heading='姿勢の特徴';
   let featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
-  if(item==='seated'){
-   const detail=(lastStillLandmarks&&typeof seatedDetailedFeatures==='function')?seatedDetailedFeatures(lastStillLandmarks,plane):focus;
-   featureHtml=(detail&&detail.length?detail:['撮影画像から、頭・肩・骨盤・膝の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
-  }
   $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>`;return;
  }
  if(item==='throw'||item==='golf'){$(targetId).innerHTML=sportResult?sportResultHtml({...sportResult,kind:item}):'<div class="status">動きを十分に確認できませんでした。頭から足先まで画面に入れ、動作全体をもう一度撮影してください。</div>';return}
@@ -631,7 +641,7 @@ function renderStandingImmediateResult(){
 function finishAnalysis(){
  const status=$('status'),box=$('analysisBox'),btn=$('resultBtn');
  if(status){status.classList.add('hidden');status.innerHTML=''}
- try{if(item==='standing')renderStandingImmediateResult();else renderPositiveFeedback('analysisFeatures');const analysisHeading=box?.querySelector('h2');if(analysisHeading&&(item==='standing'||item==='seated'))analysisHeading.textContent='解析結果'}catch(e){console.error('Analysis feedback render failed',e)}
+ try{if(item==='standing')renderStandingImmediateResult();else if(item==='seated')renderSeatedPostureResult('analysisFeatures');else renderPositiveFeedback('analysisFeatures');const analysisHeading=box?.querySelector('h2');if(analysisHeading&&(item==='standing'||item==='seated'))analysisHeading.textContent='解析結果'}catch(e){console.error('Analysis feedback render failed',e)}
  if(box)box.classList.remove('hidden');
  if(btn){btn.classList.remove('hidden');btn.disabled=false}
  if(box)box.scrollIntoView({behavior:'smooth',block:'start'});
@@ -671,6 +681,8 @@ function showResult(){
     const details=(lm&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lm,'standing',plane):[];
     const detailHtml=(details&&details.length?details:['撮影画像から全身の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
     $('resultFeatures').innerHTML=`${candidateHtml}<div class="feedbackSection"><h3>姿勢の特徴</h3>${detailHtml}</div>`;
+   }else if(item==='seated'){
+    renderSeatedPostureResult('resultFeatures');
    }else if(item==='gait'){
     renderGaitAnalysisResult('resultFeatures');
    }else{
