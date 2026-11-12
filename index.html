@@ -500,10 +500,16 @@ function renderQr(elementId,data){
 }
 function shareData(){
  const ev=['gait','stairs','squat'].includes(item)?movementEvaluation(item):null;
- const seatedShareFeatures=item==='seated'?(lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):(plane==='前額面'?['頭と身体中心の位置を確認しました。','左右の肩の高さを確認しました。','上半身と骨盤中心の位置を確認しました。','骨盤付近の高さを確認しました。','左右の膝の位置を確認しました。']:['頭と肩の前後位置を確認しました。','肩と骨盤付近の前後位置を確認しました。','骨盤付近と膝の前後位置を確認しました。'])):null;
- const resultScore=postureScore||(sportResult?{total:sportResult.score,label:'基本動作との一致度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='seated'?'座り姿勢の整い度':item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
+ const resultScore=postureScore||(sportResult?{total:sportResult.score,label:'基本動作との一致度'}:Number.isFinite(ev?.score)?{total:ev.score,label:item==='gait'?'歩行の整い度':item==='stairs'?'階段動作の整い度':'スクワットの整い度'}:null);
+ const seatedShareFeatures=item==='seated'?(lastStillLandmarks?seatedDetailedFeatures(lastStillLandmarks,plane):[]):null;
+ const seatedAdvice=item==='seated'&&typeof seatedPostureAdvice==='function'?seatedPostureAdvice(lastStillLandmarks,plane):'';
+ let gaitShareFeatures=item==='gait'&&typeof gaitFeatureDetails==='function'?gaitFeatureDetails().filter(Boolean):[];
+ const gaitFallback=[ev?.feature,'体幹中心の左右移動を確認しました。','肩と骨盤の左右への傾きを確認しました。','左右の足運びと進行方向を確認しました。'].filter(Boolean);
+ gaitFallback.forEach(x=>{if(gaitShareFeatures.length<3&&!gaitShareFeatures.includes(x))gaitShareFeatures.push(x)});
+ gaitShareFeatures=gaitShareFeatures.slice(0,3);
  const sf=sportResult?{...sportResult,action:sportAction(item,sportResult)}:null;
- return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:seatedShareFeatures||(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)),r:sf,a:ev?.action||''};
+ const sharedFeatures=seatedShareFeatures||(item==='gait'?gaitShareFeatures:(ev?[ev.feature,ev.action]:features.slice(0,item==='standing'?3:2)));
+ return{v:5,i:item,p:plane,s:resultScore,t:postureClassification?.key||'',f:sharedFeatures,r:sf,a:item==='seated'?seatedAdvice:(item==='gait'?'':(ev?.action||''))};
 }
 function createResultQr(){renderQr('resultQr',shareData());$('resultQrBox').classList.remove('hidden')}
 function openSharedResult(){
@@ -578,13 +584,14 @@ function nextActionText(){
 }
 function renderGaitAnalysisResult(targetId){
  const target=$(targetId);if(!target)return;
+ let detailList=typeof gaitFeatureDetails==='function'?gaitFeatureDetails():[];
  const ev=movementEvaluation('gait');
- 
- let detailList=[];
- if(typeof gaitFeatureDetails==='function')detailList=gaitFeatureDetails();
- if(!Array.isArray(detailList)||!detailList.length)detailList=[ev.feature||'今回の歩行から、身体の中心移動と左右の足運びを確認しました。'];
- const detailHtml=detailList.filter(Boolean).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
- target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="nextAction"><b>今回意識するポイント</b><br>${ev.action||'前方を見ながら、左右の足を同じように運ぶことを意識してみましょう。'}</div>`;
+ detailList=(Array.isArray(detailList)?detailList:[]).filter(Boolean);
+ const fallback=[ev?.feature,'体幹中心の左右移動を確認しました。','肩と骨盤の左右への傾きを確認しました。','左右の足運びと進行方向を確認しました。'].filter(Boolean);
+ fallback.forEach(x=>{if(detailList.length<3&&!detailList.includes(x))detailList.push(x)});
+ detailList=detailList.slice(0,3);
+ const detailHtml=detailList.map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+ target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div>`;
 }
 function renderSeatedPostureResult(targetId){
  const target=$(targetId);if(!target)return;
