@@ -571,13 +571,11 @@ function renderPositiveFeedback(targetId){
   const postureCard=(item==='standing'&&plane==='矢状面')?postureClassificationHtml(postureClassification):'';
   const heading=item==='standing'?'今回の立ち姿勢の特徴':'今回の座り姿勢の特徴';
   let featureHtml=focus.length?focus.map(x=>`<div class="feature focusFeature">・${x}</div>`).join(''):'<div class="feature goodFeature">身体の主要な位置関係は、おおむね整って確認できました。</div>';
-  let extra='';
   if(item==='seated'){
-   const ev=movementEvaluation('seated');
-   featureHtml=`<div class="feature focusFeature">・${ev.feature}</div>`;
-   extra=`<div class="nextAction"><b>今回意識するポイント</b><br>${ev.action}</div>`;
+   const detail=(lastStillLandmarks&&typeof postureDetailedFeatures==='function')?postureDetailedFeatures(lastStillLandmarks,'seated',plane):focus;
+   featureHtml=(detail&&detail.length?detail:['撮影画像から、頭・肩・骨盤・膝の位置関係を確認しました。']).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
-  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>${extra}`;return;
+  $(targetId).innerHTML=`${postureCard}<div class="feedbackSection"><h3>${heading}</h3>${featureHtml}</div>`;return;
  }
  if(item==='throw'||item==='golf'){$(targetId).innerHTML=sportResult?sportResultHtml({...sportResult,kind:item}):'<div class="status">動きを十分に確認できませんでした。頭から足先まで画面に入れ、動作全体をもう一度撮影してください。</div>';return}
  if(item==='gait'){renderGaitAnalysisResult(targetId);return}
