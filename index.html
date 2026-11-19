@@ -480,6 +480,24 @@ function decodeResult(value){
  const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
  return JSON.parse(new TextDecoder().decode(bytes));
 }
+function shoeGuideCandidates(){
+ return [...new Set([
+  new URL('pdf/shoe-guide.pdf',document.baseURI).href,
+  new URL('shoe-guide.pdf',document.baseURI).href
+ ])]
+}
+async function openShoeGuide(event){
+ if(event)event.preventDefault();
+ for(const url of shoeGuideCandidates()){
+  try{
+   const response=await fetch(url,{method:'HEAD',cache:'no-store'});
+   if(response.ok){window.open(url,'_blank','noopener,noreferrer');return false}
+  }catch(error){}
+ }
+ alert('靴の選び方・履き方PDFを開けませんでした。GitHubでpdfフォルダー内のshoe-guide.pdfを確認してください。');
+ return false
+}
+window.openShoeGuide=openShoeGuide;
 function renderQr(elementId,data){
  const el=$(elementId);
  if(!el)return;
@@ -531,11 +549,11 @@ function openSharedResult(){
    const typeLabel={egyptian:'エジプト型',greek:'ギリシャ型',square:'スクエア型'}[d.ft]||d.ft||'';
    const brandNames=(d.bn||[]).length?d.bn:(d.b||[]).map(code=>SHOE_BRANDS[code]?.name).filter(Boolean);
    $('sharedScore').innerHTML='';
-   $('sharedFeatures').innerHTML=`<div class="resultBox"><h2>対象区分</h2><p>${categoryLabel}</p></div><div class="resultBox"><h2>提案サイズ</h2><p>${d.sz||''}cm</p></div><div class="resultBox"><h2>JISウイズ目安：${d.w||''}${d.wl?`（${d.wl}）`:''}</h2><p>ウイズは、親指と小指の付け根を一周した「足囲」の目安です。靴を選ぶときは「細め・標準・広め」の表示を参考にしてください。</p><p class="small">※靴の形は商品ごとに異なるため、最終的には試着して確認してください。</p></div><div class="resultBox"><h2>足の形状</h2><p><b>${typeLabel}</b></p><p>${toeExplanation(typeLabel)}</p></div><div class="resultBox"><h2>おすすめメーカー（3つ）</h2>${brandNames.length?brandNames.slice(0,3).map((x,i)=>`<p>${i+1}. ${x}</p>`).join(''):'<p>条件に合うメーカーを絞り込めませんでした。表示サイズだけで決めず、つま先の形、横幅、かかとの収まりを試着で確認してください。</p>'}</div><div class="resultBox shoeGuide"><h2>靴の選び方・履き方</h2><p>靴を選ぶときの確認点と、足に合わせて履く手順をご覧いただけます。</p><a class="insoleGuideLink" href="pdf/shoe-guide.pdf" target="_blank" rel="noopener noreferrer" type="application/pdf">靴の選び方・履き方を見る</a></div>`;
+   $('sharedFeatures').innerHTML=`<div class="resultBox"><h2>対象区分</h2><p>${categoryLabel}</p></div><div class="resultBox"><h2>提案サイズ</h2><p>${d.sz||''}cm</p></div><div class="resultBox"><h2>JISウイズ目安：${d.w||''}${d.wl?`（${d.wl}）`:''}</h2><p>ウイズは、親指と小指の付け根を一周した「足囲」の目安です。靴を選ぶときは「細め・標準・広め」の表示を参考にしてください。</p><p class="small">※靴の形は商品ごとに異なるため、最終的には試着して確認してください。</p></div><div class="resultBox"><h2>足の形状</h2><p><b>${typeLabel}</b></p><p>${toeExplanation(typeLabel)}</p></div><div class="resultBox"><h2>おすすめメーカー（3つ）</h2>${brandNames.length?brandNames.slice(0,3).map((x,i)=>`<p>${i+1}. ${x}</p>`).join(''):'<p>条件に合うメーカーを絞り込めませんでした。表示サイズだけで決めず、つま先の形、横幅、かかとの収まりを試着で確認してください。</p>'}</div><div class="resultBox shoeGuide"><h2>靴の選び方・履き方</h2><p>靴を選ぶときの確認点と、足に合わせて履く手順をご覧いただけます。</p><a class="insoleGuideLink" href="./pdf/shoe-guide.pdf" target="_blank" rel="noopener noreferrer" type="application/pdf" onclick="return openShoeGuide(event)">靴の選び方・履き方を見る</a></div>`;
   }else{
    const sharedScoreData=d.s||d.score;if(sharedScoreData&&Number.isFinite(sharedScoreData.score)&&!Number.isFinite(sharedScoreData.total))sharedScoreData.total=sharedScoreData.score;$('sharedScore').innerHTML=scoreHtml(sharedScoreData)+postureClassificationHtml(sharedType)+(d.r?sportResultHtml(d.r):'');
    const sharedFeatureList=(d.f||d.features||[]);
-   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:(sharedItem==='throw'||sharedItem==='golf')?`<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedItem==='gait'?`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div><div class="feedbackSection gaitMetricSection"><h3>歩行の確認項目</h3>${sharedFeatureList.slice(3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
+   $('sharedFeatures').innerHTML=sharedItem==='seated'?`<div class="feedbackSection"><h3>姿勢の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div><div class="nextAction seatedAdvice"><b>姿勢の整え方</b><br>${d.a||seatedPostureAdvice()}</div>`:(sharedItem==='throw'||sharedItem==='golf')?`<div class="feedbackSection sportMotionFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedItem==='gait'?`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div><div class="feedbackSection gaitMetricSection"><h3>歩行の確認項目</h3>${sharedFeatureList.slice(3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('')}</div>`:sharedFeatureList.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
   }
   const hideSharedNote=postureShared||footShared||sharedItem==='gait';
   $('sharedNote').textContent=hideSharedNote?'':'今回確認できた結果です。';
@@ -621,6 +639,7 @@ function renderGaitAnalysisResult(targetId){
  const metricHtml=[['立脚時間の左右差',metrics.stance],['膝の位置（開き具合）',metrics.knee],['体幹の傾きの左右差',metrics.trunk],['足の上がり具合',metrics.lift]].map(([label,text])=>`<div class="feature focusFeature"><b>${label}</b><br>${text}</div>`).join('');
  target.innerHTML=`<div class="feedbackSection gaitFeatureSection"><h3>動作の特徴</h3>${detailHtml}</div><div class="feedbackSection gaitMetricSection"><h3>歩行の確認項目</h3>${metricHtml}</div>`;
 }
+function seatedPostureAdvice(){return'両手を挙げて背伸びをすると、身体がまっすぐになります。'}
 function renderSeatedPostureResult(targetId){
  const target=$(targetId);if(!target)return;
  const lm=lastStillLandmarks;
@@ -633,7 +652,7 @@ function renderSeatedPostureResult(targetId){
  }
  const featureHtml=detail.slice(0,3).map(x=>`<div class="feature focusFeature">・${x}</div>`).join('');
  const score=postureScore?scoreHtml(postureScore):'';
- target.innerHTML=`${score}<div class="feedbackSection seatedFeatureSection"><h3>姿勢の特徴</h3>${featureHtml}</div>`;
+ target.innerHTML=`${score}<div class="feedbackSection seatedFeatureSection"><h3>姿勢の特徴</h3>${featureHtml}</div><div class="nextAction seatedAdvice"><b>姿勢の整え方</b><br>${seatedPostureAdvice()}</div>`;
 }
 function renderPositiveFeedback(targetId){
  if(item==='seated'){renderSeatedPostureResult(targetId);return}
